@@ -40,3 +40,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+.idea
+.yarn.lock
+yarn.lock
+package-lock.json
