@@ -1,14 +1,14 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { AuthUser, AuthUserModel } from "../../model";
 
 export const exampleRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
+  address: publicProcedure
+    .input(z.object({text: z.string()}))
+    .query(async ({input}) => {
+      const user: AuthUser = await AuthUserModel.findOne({userName: input.text}).lean();
+      return {address: user?.userAddress ?? ""};
     }),
 
   getSecretMessage: protectedProcedure.query(() => {

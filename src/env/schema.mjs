@@ -20,6 +20,8 @@ export const serverSchema = z.object({
   ),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
+  TWITTER_ID: z.string(),
+  TWITTER_SECRET: z.string(),
 });
 
 /**
@@ -33,6 +35,8 @@ export const serverEnv = {
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  TWITTER_ID: process.env.TWITTER_ID,
+  TWITTER_SECRET: process.env.TWITTER_SECRET,
 };
 
 /**

@@ -37,7 +37,6 @@ const LoginListView: NextPage = () => {
     if (session) {
       router.push("/success");
     }
-
   }, [session]);
 
 

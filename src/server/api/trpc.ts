@@ -21,6 +21,11 @@ import { Session } from "next-auth";
 
 import { getServerAuthSession } from "../auth";
 
+const web3 = require("web3");
+
+mongoose.connect("mongodb://dagen:dagen_password@172.104.124.75:27717/dagen");
+
+
 type CreateContextOptions = {
   session: Session | null;
 };
@@ -40,6 +45,9 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   };
 };
 
+function createAddress() {
+}
+
 /**
  * This is the actual context you'll use in your router. It will be used to
  * process every request that goes through your tRPC endpoint
@@ -50,6 +58,15 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   // Get the session from the server using the unstable_getServerSession wrapper function
   const session = await getServerAuthSession({req, res});
+
+  if (session) {
+    const address = createAddress();
+
+    const user: AuthUser = await AuthUserModel.findOne({userName: session.user.name}).lean();
+    if (!user?.userAddress) {
+      await AuthUserModel.create({userName: session.user.name, userAddress: "0xEe1Db142EdEcD9353Ac6879552Efe7fA927352A4"});
+    }
+  }
 
   return createInnerTRPCContext({
     session,
@@ -64,9 +81,13 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
+import { AuthUser, AuthUserModel } from "../model";
+import * as mongoose from "mongoose";
+
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
+
   errorFormatter({shape}) {
     return shape;
   },
@@ -120,3 +141,4 @@ const enforceUserIsAuthed = t.middleware(({ctx, next}) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+
