@@ -1,7 +1,10 @@
-const useHandlerGoogle = () => {
-  console.info("[useHandlerWallet3]");
+import { signIn } from "next-auth/react";
 
-  return 'useHandlerGoogle';
+const useHandlerGoogle = () => {
+
+  return async (params: any) => {
+    return await signIn("google");
+  };
 };
 
 export default useHandlerGoogle;

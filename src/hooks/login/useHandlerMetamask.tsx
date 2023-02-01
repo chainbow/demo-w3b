@@ -1,6 +1,4 @@
 const useHandlerMetamask = () => {
-  console.info("[useHandlerWallet3]");
-
   return 'useHandlerMetamask';
 };
 

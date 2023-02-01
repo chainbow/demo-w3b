@@ -1,13 +1,11 @@
 import type { GetServerSidePropsContext } from "next";
 import {
   getServerSession,
-   NextAuthOptions,
-   DefaultSession,
+  NextAuthOptions,
+  DefaultSession,
 } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "../env/server.mjs";
-import { prisma } from "./db";
 
 /**
  * Module augmentation for `next-auth` types
@@ -37,19 +35,18 @@ declare module "next-auth" {
  **/
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id;
-        // session.user.role = user.role; <-- put other properties on the session here
-      }
+    session({session, user}) {
+      // if (session.user) {
+      //   session.user.id = user.id;
+      //   // session.user.role = user.role; <-- put other properties on the session here
+      // }
       return session;
     },
   },
-  adapter: PrismaAdapter(prisma),
   providers: [
     DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
     /**
      * ...add more providers here
