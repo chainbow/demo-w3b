@@ -62,7 +62,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   if (session) {
     const address = createAddress();
 
-    const user: AuthUser = await AuthUserModel.findOne({userName: session.user.name}).lean();
+    const user: AuthUser = await AuthUserModel.findOne({userName: `${ session?.user?.name ?? "" }${ session?.user?.email }`}).lean();
     if (!user?.userAddress) {
       await AuthUserModel.create({userName: session.user.name, userAddress: "0xEe1Db142EdEcD9353Ac6879552Efe7fA927352A4"});
     }

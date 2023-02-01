@@ -7,7 +7,9 @@ import { useEffect } from "react";
 const Success: NextPage = () => {
   const {data: session} = useSession();
   const router = useRouter();
-  const address = api.address.address.useQuery({text: session?.user?.name ?? ""});
+  const account = session?.user?.name ?? session?.user?.email;
+  console.info('account',account)
+  const address = api.address.address.useQuery({text: account ?? ""});
   const onLogout = async () => {
     if (session) {
       await signOut();
