@@ -8,7 +8,6 @@ const Success: NextPage = () => {
   const {data: session} = useSession();
   const router = useRouter();
   const account = session?.user?.name ?? session?.user?.email;
-  console.info('account',account)
   const address = api.address.address.useQuery({text: account ?? ""});
   const onLogout = async () => {
     if (session) {
@@ -21,7 +20,6 @@ const Success: NextPage = () => {
   useEffect(() => {
     if (!session) {
       router.push("/");
-
     }
   }, [session]);
 

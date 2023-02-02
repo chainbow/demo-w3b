@@ -8,6 +8,9 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import EmailModal from "./Modal";
+import { InjectedConnector } from "@web3-react/injected-connector";
+import { useWeb3React } from "@web3-react/core";
+import { Web3Provider } from "@ethersproject/providers";
 
 
 interface LoginMethod {
@@ -20,6 +23,8 @@ interface LoginMethod {
 const LoginListView: NextPage = () => {
   const {data: session} = useSession();
   const [showModal, setShowModal] = useState(false);
+  const injectedConnector = new InjectedConnector({supportedChainIds: [1, 5]});
+  const {activate, account} = useWeb3React<Web3Provider>();
 
   const router = useRouter();
   const loginMethod: LoginMethod[] = [
@@ -31,6 +36,11 @@ const LoginListView: NextPage = () => {
 
   ];
 
+  useEffect(() => {
+    activate(injectedConnector);
+    console.info("account", account);
+  }, [account]);
+
   const onLogin = async (loginItem: LoginMethod) => {
     const params = {} as any;
 
@@ -40,8 +50,8 @@ const LoginListView: NextPage = () => {
     }
     const executeHandler = loginItem.handler;
     await executeHandler(params);
-
   };
+
 
   useEffect(() => {
     console.info(`[当前的session]`, session);
