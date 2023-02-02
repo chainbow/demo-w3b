@@ -1,10 +1,51 @@
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import type { GetServerSidePropsContext } from "next";
-import type { NextAuthOptions, DefaultSession } from "next-auth";
-import { getServerSession } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
-import { env } from "../env/server.mjs";
-import { AuthUserModel } from "./model";
-import mongoose from "mongoose";
+import {
+  getServerSession,
+  type DefaultSession,
+  type NextAuthOptions,
+} from "next-auth";
+import Email from "next-auth/providers/email";
+import Google from "next-auth/providers/google";
+import Twitter from "next-auth/providers/twitter";
+import { prisma } from "./db";
+import { createTransport } from "nodemailer";
+
+function html(params: { token: string }) {
+  const { token } = params;
+
+  return `
+        <body>
+          <div>[dagen] Verification Code</div>
+
+          <br />
+          <br />
+          <br />
+          
+          <div>Here is your dagen verification code. Please enter it soon before it expires in 10 minutes:</div>
+          <br />
+          <div style="font-size: 22px;">
+            <strong>${token}</strong>
+          </div>
+          <br />
+          <div>If you did not initiate this operation, please ignore it.</div>
+          <div>dagen Team</div>
+        </body>
+        `;
+}
+
+/** Email Text body (fallback for email clients that don't render HTML, e.g. feature phones) */
+function text({
+  url,
+  host,
+  token,
+}: {
+  url: string;
+  host: string;
+  token: string;
+}) {
+  return `Sign in to ${host}\n${url}\n${token}\n`;
+}
 
 /**
  * Module augmentation for `next-auth` types
@@ -19,11 +60,6 @@ declare module "next-auth" {
       walletAddress: string;
     } & DefaultSession["user"];
   }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
 }
 
 /**
@@ -33,24 +69,69 @@ declare module "next-auth" {
  **/
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session({ session, user }) {
+    async session({ session, user }) {
+      if (session.user) {
+        session.user.id = user.id;
+        // session.user.role = user.role; <-- put other properties on the session here
+      }
+
+      const myHeaders = new Headers();
+      myHeaders.set("apikey", process.env.API_KEY as string);
+
+      const myRequest = new Request(
+        "http://wallet3.net/api/address?accountId=xx&xpub=xpub6C44gXqtPeBkher6yeZBhn5r36U5qh5z4W9GgFAQxZXVbsYiquW9JtVLHMurBfNR86M1A9nWSyMHtpjLHKehyCzd73vXE52YxTsCC9UejUk&provider=chrissusuhao@gmail.com",
+        {
+          method: "GET",
+          headers: myHeaders,
+        }
+      );
+
+      const res = await fetch(myRequest);
+      const json = await res.json();
+      console.log(json);
+      session.user.walletAddress = json.address;
+
       return session;
     },
   },
+  adapter: PrismaAdapter(prisma),
   providers: [
-    DiscordProvider({
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
     }),
-    /**
-     * ...add more providers here
-     *
-     * Most other providers require a bit more work than the Discord provider.
-     * For example, the GitHub provider requires you to add the
-     * `refresh_token_expires_in` field to the Account model. Refer to the
-     * NextAuth.js docs for the provider you want to use. Example:
-     * @see https://next-auth.js.org/providers/github
-     **/
+    Twitter({
+      clientId: process.env.TWITTER_ID ?? "",
+      clientSecret: process.env.TWITTER_SECRET ?? "",
+      version: "2.0",
+    }),
+    Email({
+      server: {
+        host: process.env.EMAIL_SERVER_HOST,
+        port: Number(process.env.EMAIL_SERVER_PORT),
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD,
+        },
+      },
+      from: process.env.EMAIL_FROM,
+      async sendVerificationRequest(params) {
+        const { identifier, url, provider, theme, token } = params;
+        const { host } = new URL(url);
+        const transport = createTransport(provider.server);
+        const result = await transport.sendMail({
+          to: identifier,
+          from: provider.from,
+          subject: `Sign in to ${host}`,
+          text: text({ url, host, token }),
+          html: html({ token }),
+        });
+        const failed = result.rejected.concat(result.pending).filter(Boolean);
+        if (failed.length) {
+          throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
+        }
+      },
+    }),
   ],
 };
 
