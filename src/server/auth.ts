@@ -1,15 +1,10 @@
 import type { GetServerSidePropsContext } from "next";
-import {
-  getServerSession,
-  NextAuthOptions,
-  DefaultSession,
-} from "next-auth";
+import type { NextAuthOptions, DefaultSession } from "next-auth";
+import { getServerSession } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import { env } from "../env/server.mjs";
 import { AuthUserModel } from "./model";
 import mongoose from "mongoose";
-
-
 
 /**
  * Module augmentation for `next-auth` types
@@ -21,8 +16,7 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      walletAddress: string;
     } & DefaultSession["user"];
   }
 
@@ -38,8 +32,8 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  **/
 export const authOptions: NextAuthOptions = {
-  callbacks:  {
-    session({session, user}) {
+  callbacks: {
+    session({ session, user }) {
       return session;
     },
   },

@@ -1,12 +1,7 @@
 import NextAuth from "next-auth";
+import type { AuthOptions } from "next-auth/core/types";
 import Google from "next-auth/providers/google";
-import { AuthOptions } from "next-auth/core/types";
 import Twitter from "next-auth/providers/twitter";
-import Email from "next-auth/providers/email";
-import { createTransport } from "nodemailer";
-import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import clientPromise from "../../../lib/mongodb";
-import { useSession } from "next-auth/react";
 
 /**
  * Email HTML body
@@ -17,7 +12,7 @@ import { useSession } from "next-auth/react";
  * @note We don't add the email address to avoid needing to escape it, if you do, remember to sanitize it!
  */
 function html(params: { token: string }) {
-  const {token} = params;
+  const { token } = params;
 
   return `
         <body>
@@ -30,7 +25,7 @@ function html(params: { token: string }) {
           <div>Here is your dagen verification code. Please enter it soon before it expires in 10 minutes:</div>
           <br />
           <div style="font-size: 22px;">
-            <strong>${ token }</strong>
+            <strong>${token}</strong>
           </div>
           <br />
           <div>If you did not initiate this operation, please ignore it.</div>
@@ -39,10 +34,17 @@ function html(params: { token: string }) {
         `;
 }
 
-
 /** Email Text body (fallback for email clients that don't render HTML, e.g. feature phones) */
-function text({url, host, token}: { url: string; host: string; token: string }) {
-  return `Sign in to ${ host }\n${ url }\n${ token }\n`;
+function text({
+  url,
+  host,
+  token,
+}: {
+  url: string;
+  host: string;
+  token: string;
+}) {
+  return `Sign in to ${host}\n${url}\n${token}\n`;
 }
 
 export const authOptions: AuthOptions = {
@@ -96,24 +98,41 @@ export const authOptions: AuthOptions = {
     maxAge: 60 * 60 * 24 * 30,
   },
   callbacks: {
-    async signIn({user, account, profile, email, credentials}) {
+    async signIn({ user, account, profile, email, credentials }) {
       console.info("signIn====", user, account, profile, email, credentials);
       return true;
     },
-    async redirect({url, baseUrl}) {
+    async redirect({ url, baseUrl }) {
       console.info("redirect====", url, baseUrl);
       // Allows relative callback URLs
-      if (url.startsWith("/")) return `${ baseUrl }${ url }`;
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
       // Allows callback URLs on the same origin
       else if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
     },
-    async session({session, user, token}) {
+    async session({ session, user, token }) {
       console.info("session====", session);
+
+      // session.user.walletAddress;
+
+      // const myHeaders = new Headers();
+      // myHeaders.set("apikey", "20f1d1f7b9cd4c1d9b86b14b5f5647d1");
+
+      // const myRequest = new Request(
+      //   "http://wallet3.net/api/address?accountId=xx&xpub=xpub6C44gXqtPeBkher6yeZBhn5r36U5qh5z4W9GgFAQxZXVbsYiquW9JtVLHMurBfNR86M1A9nWSyMHtpjLHKehyCzd73vXE52YxTsCC9UejUk&provider=chrissusuhao@gmail.com",
+      //   {
+      //     method: "GET",
+      //     headers: myHeaders,
+      //   }
+      // );
+
+      // const res = await fetch(myRequest);
+      // const json = await res.json();
+      // console.log(json);
 
       return session;
     },
-    async jwt({token, user, account, profile, isNewUser}) {
+    async jwt({ token, user, account, profile, isNewUser }) {
       return token;
     },
   },
