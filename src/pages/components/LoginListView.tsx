@@ -25,7 +25,6 @@ const LoginListView: NextPage = () => {
   const [showModal, setShowModal] = useState(false);
   const injectedConnector = new InjectedConnector({supportedChainIds: [1, 5]});
   const {activate, account} = useWeb3React<Web3Provider>();
-
   const router = useRouter();
   const loginMethod: LoginMethod[] = [
     {name: "Wallet3", img: "", handler: useHandlerWallet3()},
@@ -33,12 +32,10 @@ const LoginListView: NextPage = () => {
     {name: "Email", img: "", handler: useHandlerEmail()},
     {name: "Twitter", img: "", handler: useHandlerTwitter()},
     {name: "Google", img: "", handler: useHandlerGoogle()},
-
   ];
 
   useEffect(() => {
     activate(injectedConnector);
-    console.info("account", account);
   }, [account]);
 
   const onLogin = async (loginItem: LoginMethod) => {
@@ -54,8 +51,6 @@ const LoginListView: NextPage = () => {
 
 
   useEffect(() => {
-    console.info(`[当前的session]`, session);
-
     if (session) {
       router.push("/success");
     }
@@ -66,8 +61,6 @@ const LoginListView: NextPage = () => {
     <div style={ {display: "flex", width: "70%", flexWrap: "wrap", gap: "20px"} }>
 
       { showModal && <EmailModal show={ true } onCallback={ (show) => setShowModal(show) }/> }
-
-
       { loginMethod.map((loginItem) => {
         return <div
           key={ `login_item_${ loginItem.name }` }
@@ -75,10 +68,8 @@ const LoginListView: NextPage = () => {
           <button className="rounded-md w-20 h-10 bg-green-500 from-gray-50 cursor-pointer transform hover:bg-green-400 active:bg-green-600 text-white" onClick={ () => onLogin(loginItem) }>
             { loginItem.name }
           </button>
-
         </div>;
       }) }
-
 
     </div>
   );

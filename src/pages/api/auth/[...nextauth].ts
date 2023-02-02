@@ -46,7 +46,7 @@ function text({url, host, token}: { url: string; host: string; token: string }) 
 }
 
 export const authOptions: AuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
+  // adapter: MongoDBAdapter(clientPromise),
   // Configure one or more authentication providers
   providers: [
     Google({
@@ -58,36 +58,36 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.TWITTER_SECRET ?? "",
       version: "2.0",
     }),
-    Email({
-      server: {
-        host: process.env.EMAIL_SERVER_HOST,
-        port: Number(process.env.EMAIL_SERVER_PORT),
-        auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD,
-        },
-      },
-      from: process.env.EMAIL_FROM,
-      async generateVerificationToken() {
-        return String(Math.floor(Math.random() * 899999) + 100000);
-      },
-      async sendVerificationRequest(params) {
-        const {identifier, url, provider, theme, token} = params;
-        const {host} = new URL(url);
-        const transport = createTransport(provider.server);
-        const result = await transport.sendMail({
-          to: identifier,
-          from: provider.from,
-          subject: `Sign in to ${ host }`,
-          text: text({url, host, token}),
-          html: html({token}),
-        });
-        const failed = result.rejected.concat(result.pending).filter(Boolean);
-        if (failed.length) {
-          throw new Error(`Email(s) (${ failed.join(", ") }) could not be sent`);
-        }
-      },
-    }),
+    // Email({
+    //   server: {
+    //     host: process.env.EMAIL_SERVER_HOST,
+    //     port: Number(process.env.EMAIL_SERVER_PORT),
+    //     auth: {
+    //       user: process.env.EMAIL_SERVER_USER,
+    //       pass: process.env.EMAIL_SERVER_PASSWORD,
+    //     },
+    //   },
+    //   from: process.env.EMAIL_FROM,
+    //   async generateVerificationToken() {
+    //     return String(Math.floor(Math.random() * 899999) + 100000);
+    //   },
+    //   async sendVerificationRequest(params) {
+    //     const {identifier, url, provider, theme, token} = params;
+    //     const {host} = new URL(url);
+    //     const transport = createTransport(provider.server);
+    //     const result = await transport.sendMail({
+    //       to: identifier,
+    //       from: provider.from,
+    //       subject: `Sign in to ${ host }`,
+    //       text: text({url, host, token}),
+    //       html: html({token}),
+    //     });
+    //     const failed = result.rejected.concat(result.pending).filter(Boolean);
+    //     if (failed.length) {
+    //       throw new Error(`Email(s) (${ failed.join(", ") }) could not be sent`);
+    //     }
+    //   },
+    // }),
   ],
   session: {
     strategy: "jwt",
@@ -97,10 +97,7 @@ export const authOptions: AuthOptions = {
   },
   callbacks: {
     async signIn({user, account, profile, email, credentials}) {
-
-
       console.info("signIn====", user, account, profile, email, credentials);
-
       return true;
     },
     async redirect({url, baseUrl}) {
