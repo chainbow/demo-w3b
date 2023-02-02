@@ -16,15 +16,14 @@
  * processing a request
  *
  */
-import { CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { Session } from "next-auth";
+import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
+import type { Session } from "next-auth";
 
 import { getServerAuthSession } from "../auth";
 
 const web3 = require("web3");
 
 mongoose.connect("mongodb://dagen:dagen_password@172.104.124.75:27717/dagen");
-
 
 type CreateContextOptions = {
   session: Session | null;
@@ -42,11 +41,9 @@ type CreateContextOptions = {
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
+    prisma,
   };
 };
-
-function createAddress() {
-}
 
 /**
  * This is the actual context you'll use in your router. It will be used to
@@ -54,19 +51,10 @@ function createAddress() {
  * @link https://trpc.io/docs/context
  */
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  const {req, res} = opts;
+  const { req, res } = opts;
 
-  // Get the session from the server using the unstable_getServerSession wrapper function
-  const session = await getServerAuthSession({req, res});
-
-  if (session) {
-    const address = createAddress();
-
-    const user: AuthUser = await AuthUserModel.findOne({userName: `${ session?.user?.name ?? "" }${ session?.user?.email ?? "" }`}).lean();
-    if (!user?.userAddress) {
-      await AuthUserModel.create({userName: `${ session?.user?.name ?? "" }${ session?.user?.email ?? "" }`, userAddress: "0xEe1Db142EdEcD9353Ac6879552Efe7fA927352A4"});
-    }
-  }
+  // Get the session from the server using the getServerSession wrapper function
+  const session = await getServerAuthSession({ req, res });
 
   return createInnerTRPCContext({
     session,
@@ -80,15 +68,13 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  * transformer
  */
 import { initTRPC, TRPCError } from "@trpc/server";
-import superjson from "superjson";
-import { AuthUser, AuthUserModel } from "../model";
 import * as mongoose from "mongoose";
-
+import superjson from "superjson";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
 
-  errorFormatter({shape}) {
+  errorFormatter({ shape }) {
     return shape;
   },
 });
@@ -119,14 +105,14 @@ export const publicProcedure = t.procedure;
  * Reusable middleware that enforces users are logged in before running the
  * procedure
  */
-const enforceUserIsAuthed = t.middleware(({ctx, next}) => {
+const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({code: "UNAUTHORIZED"});
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
     ctx: {
       // infers the `session` as non-nullable
-      session: {...ctx.session, user: ctx.session.user},
+      session: { ...ctx.session, user: ctx.session.user },
     },
   });
 });
@@ -141,4 +127,3 @@ const enforceUserIsAuthed = t.middleware(({ctx, next}) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
-
