@@ -6,6 +6,7 @@ import Email from "next-auth/providers/email";
 import { createTransport } from "nodemailer";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "../../../lib/mongodb";
+import { useSession } from "next-auth/react";
 
 /**
  * Email HTML body
@@ -96,6 +97,10 @@ export const authOptions: AuthOptions = {
   },
   callbacks: {
     async signIn({user, account, profile, email, credentials}) {
+
+
+      console.info("signIn====", user, account, profile, email, credentials);
+
       return true;
     },
     async redirect({url, baseUrl}) {
@@ -107,6 +112,8 @@ export const authOptions: AuthOptions = {
       return baseUrl;
     },
     async session({session, user, token}) {
+      console.info("session====", session);
+
       return session;
     },
     async jwt({token, user, account, profile, isNewUser}) {

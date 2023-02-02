@@ -56,6 +56,7 @@ const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
   const [showCodeMsg, setShowCodeMsg] = useState("获取验证码");
   const [currentEmail, setCurrentEmail] = useState("");
   const [verifyCode, setVerifyCode] = useState("");
+  const [errorMsg, setErrorMsg] = useState();
 
 
   const onSendEmailCode = async () => {
@@ -73,9 +74,14 @@ const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
 
   const onLoginEmail = async () => {
     if (currentEmail && verifyCode) {
-      await axios.get("/api/auth/callback/email", {params: {token: verifyCode.trim(), email: currentEmail.trim()}});
-      setShowModal(false);
-      onCallback(false);
+      try {
+        await axios.get("/api/auth/callback/email", {params: {token: verifyCode.trim(), email: currentEmail.trim()}});
+        setShowModal(false);
+        onCallback(false);
+        window.location.reload();
+      } catch (error: any) {
+        setErrorMsg(error.message);
+      }
     }
 
   };
@@ -90,6 +96,10 @@ const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
 
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+
+                <div>
+                  { errorMsg }
+                </div>
 
                 <div style={ {position: "absolute", top: "0%", right: "3%", fontSize: "20px", padding: "10px"} }>
                   <span className="transform motion-safe:hover:scale-110 cursor-pointer" onClick={ () => onDismiss() }> x</span>

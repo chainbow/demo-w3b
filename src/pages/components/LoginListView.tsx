@@ -44,6 +44,8 @@ const LoginListView: NextPage = () => {
   };
 
   useEffect(() => {
+    console.info(`[当前的session]`, session);
+
     if (session) {
       router.push("/success");
     }

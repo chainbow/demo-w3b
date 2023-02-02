@@ -8,8 +8,8 @@ export interface AuthUser {
 
 export const AuthUserSchema = new mongoose.Schema<AuthUser>(
   {
-    userAddress: {type: String, required: true, unique: true},
-    userName: {type: String, required: true, unique: true},
+    userAddress: {type: String, required: true},
+    userName: {type: String, required: true},
   },
   {
     versionKey: false,
