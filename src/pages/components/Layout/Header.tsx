@@ -111,24 +111,7 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
             >
               Pricing
             </LinkScroll>
-            <LinkScroll
-              activeClass="active"
-              to="testimoni"
-              spy={ true }
-              smooth={ true }
-              duration={ 1000 }
-              onSetActive={ () => {
-                setActiveLink("testimoni");
-              } }
-              className={
-                "px-4 py-2 mx-2 cursor-pointer animation-hover inline-block relative" +
-                (activeLink === "testimoni"
-                  ? " text-orange-500 animation-active "
-                  : " text-black-500 hover:text-orange-500 ")
-              }
-            >
-              Testimonial
-            </LinkScroll>
+      
           </ul>
           <div className="col-start-10 col-end-12 font-medium flex justify-end items-center">
             <button
