@@ -12,7 +12,7 @@ import { prisma } from "./db";
 import { createTransport } from "nodemailer";
 
 function html(params: { token: string }) {
-  const { token } = params;
+  const {token} = params;
 
   return `
         <body>
@@ -25,7 +25,7 @@ function html(params: { token: string }) {
           <div>Here is your dagen verification code. Please enter it soon before it expires in 10 minutes:</div>
           <br />
           <div style="font-size: 22px;">
-            <strong>${token}</strong>
+            <strong>${ token }</strong>
           </div>
           <br />
           <div>If you did not initiate this operation, please ignore it.</div>
@@ -44,7 +44,7 @@ function text({
   host: string;
   token: string;
 }) {
-  return `Sign in to ${host}\n${url}\n${token}\n`;
+  return `Sign in to ${ host }\n${ url }\n${ token }\n`;
 }
 
 /**
@@ -69,7 +69,7 @@ declare module "next-auth" {
  **/
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    async session({ session, user }) {
+    async session({session, user}) {
       if (session.user) {
         session.user.id = user.id;
         // session.user.role = user.role; <-- put other properties on the session here
@@ -83,7 +83,7 @@ export const authOptions: NextAuthOptions = {
         {
           method: "GET",
           headers: myHeaders,
-        }
+        },
       );
 
       const res = await fetch(myRequest);
@@ -116,19 +116,20 @@ export const authOptions: NextAuthOptions = {
       },
       from: process.env.EMAIL_FROM,
       async sendVerificationRequest(params) {
-        const { identifier, url, provider, theme, token } = params;
-        const { host } = new URL(url);
+        const {identifier, url, provider, theme, token} = params;
+        console.info("我的token", token);
+        const {host} = new URL(url);
         const transport = createTransport(provider.server);
         const result = await transport.sendMail({
           to: identifier,
           from: provider.from,
-          subject: `Sign in to ${host}`,
-          text: text({ url, host, token }),
-          html: html({ token }),
+          subject: `Sign in to ${ host }`,
+          text: text({url, host, token}),
+          html: html({token}),
         });
         const failed = result.rejected.concat(result.pending).filter(Boolean);
         if (failed.length) {
-          throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
+          throw new Error(`Email(s) (${ failed.join(", ") }) could not be sent`);
         }
       },
     }),
