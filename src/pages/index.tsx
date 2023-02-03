@@ -55,7 +55,7 @@ const HomeDialog: NextPage<IHomeDialog> = ({onDismissCallback}) => {
                       <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
                         选择登陆方式
                       </Dialog.Title>
-                      <div className="mt-2" style={ {display: "flex", alignItems: "center", flexWrap: "wrap", gap: "10px"} }>
+                      <div className="mt-2" style={ {display: "flex", padding: "10px 0", alignItems: "center", justifyContent: "center", flexWrap: "wrap"} }>
                         <LoginListView/>
                       </div>
                     </div>

@@ -9,6 +9,7 @@ import EmailModal from "./Modal";
 import { InjectedConnector } from "@web3-react/injected-connector";
 import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
+import { Avatar, ImageList, ImageListItem } from "@mui/material";
 
 
 interface LoginMethod {
@@ -23,11 +24,11 @@ const LoginListView: NextPage = () => {
   const injectedConnector = new InjectedConnector({supportedChainIds: [1, 5]});
   const {activate, account} = useWeb3React<Web3Provider>();
   const loginMethod: LoginMethod[] = [
-    {name: "Wallet3", img: "", handler: useHandlerWallet3()},
-    {name: "Metamask", img: "", handler: useHandlerMetamask()},
-    {name: "Email", img: "", handler: useHandlerEmail()},
-    {name: "Twitter", img: "", handler: useHandlerTwitter()},
-    {name: "Google", img: "", handler: useHandlerGoogle()},
+    {name: "Wallet3", img: "wallet3", handler: useHandlerWallet3()},
+    {name: "Metamask", img: "metamask", handler: useHandlerMetamask()},
+    {name: "Email", img: "mail", handler: useHandlerEmail()},
+    {name: "Twitter", img: "twitter", handler: useHandlerTwitter()},
+    {name: "Google", img: "google", handler: useHandlerGoogle()},
   ];
 
   useEffect(() => {
@@ -49,15 +50,18 @@ const LoginListView: NextPage = () => {
   return (
     <>
       { showModal && <EmailModal show={ true } onCallback={ (show) => setShowModal(show) }/> }
-      { loginMethod.map((loginItem) => {
-        return <div
-          key={ `login_item_${ loginItem.name }` }
-          style={ {display: "flex", justifyContent: "center", alignItems: "center", height: "100px", width: "100px", backgroundColor: "black"} }>
-          <button className="rounded-md w-20 h-10 bg-green-500 from-gray-50 cursor-pointer transform hover:bg-green-400 active:bg-green-600 text-white" onClick={ () => onLogin(loginItem) }>
-            { loginItem.name }
-          </button>
-        </div>;
-      }) }
+
+      <div style={ {display: "flex", alignItems: "center", gap: "70px", flexWrap: "wrap", justifyContent: "center"} }>
+        { loginMethod.map((loginItem) => {
+          return <div onClick={ () => onLogin(loginItem) } key={ `login_item_${ loginItem.name }` }
+                      className="cursor-pointer motion-safe:hover:scale-110"
+                      style={ {display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "5px"} }>
+            <Avatar variant="square" alt="Remy Sharp" src={ `/${ loginItem.img }.png` } sx={ {width: 64, height: 64} }/>
+            <span>{ loginItem.name }</span>
+          </div>;
+        }) }
+      </div>
+
 
     </>
   );
