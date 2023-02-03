@@ -111,7 +111,7 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
             >
               Pricing
             </LinkScroll>
-      
+
           </ul>
           <div className="col-start-10 col-end-12 font-medium flex justify-end items-center">
             <button

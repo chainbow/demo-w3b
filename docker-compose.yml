@@ -1,0 +1,21 @@
+version: '3.5'
+
+services:
+  auth_client:
+    image: auth_client:latest
+    container_name: auth_client
+    restart: always
+    environment:
+      VIRTUAL_HOST: demo.wallet3.net
+      VIRTUAL_PORT: 3000
+      LETSENCRYPT_HOST: demo.wallet3.net
+      LETSENCRYPT_EMAIL: lilong@chainbow.io
+    command: npm run start
+    ports:
+      - "9099:3000"
+    networks:
+      - shared
+
+networks:
+  shared:
+    external: true

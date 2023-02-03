@@ -48,6 +48,7 @@ export interface IModal {
 }
 
 export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
+  const executeHandler = useHandlerEmail();
   const [open, setOpen] = useState(true);
   const [showCodeMsg, setShowCodeMsg] = useState("获取验证码");
   const [currentEmail, setCurrentEmail] = useState("");
@@ -95,7 +96,6 @@ export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
     if (currentEmail) {
       setCanSend(false);
       setShowCodeMsg("已发送");
-      const executeHandler = useHandlerEmail();
       await executeHandler(currentEmail.trim());
       timer = setInterval(() => {
         timeCount--;
@@ -222,3 +222,5 @@ export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
     </Transition.Root>
   );
 };
+
+export default EmailModal

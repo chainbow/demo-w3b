@@ -1,0 +1,11 @@
+node_modules
+.dockerignore
+.gitignore
+pnpm-lock.yaml
+Dockerfile
+.git
+.idea
+README.md
+.next
+next-env.d.ts
+

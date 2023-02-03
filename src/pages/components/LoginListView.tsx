@@ -7,7 +7,7 @@ import useHandlerGoogle from "../../hooks/login/useHandlerGoogle";
 import { useEffect, useState } from "react";
 import { InjectedConnector } from "@web3-react/injected-connector";
 import { useWeb3React } from "@web3-react/core";
-import { Web3Provider } from "@ethersproject/providers";
+// import type { Web3Provider } from "@ethersproject/providers";
 import { Avatar } from "@mui/material";
 import { EmailModal } from "./EmailModal";
 
@@ -22,7 +22,7 @@ interface LoginMethod {
 const LoginListView: NextPage = () => {
   const [showModal, setShowModal] = useState(false);
   const injectedConnector = new InjectedConnector({supportedChainIds: [1, 5]});
-  const {activate, account} = useWeb3React<Web3Provider>();
+  // const {activate, account} = useWeb3React<Web3Provider>();
   const loginMethod: LoginMethod[] = [
     {name: "Wallet3", img: "wallet3", handler: useHandlerWallet3()},
     {name: "Metamask", img: "metamask", handler: useHandlerMetamask()},
@@ -32,9 +32,9 @@ const LoginListView: NextPage = () => {
   ];
 
 
-  useEffect(() => {
-    activate(injectedConnector);
-  }, [account]);
+  // useEffect(() => {
+  //   activate(injectedConnector);
+  // }, [account]);
 
   const onLogin = async (loginItem: LoginMethod) => {
     const params = {} as any;
