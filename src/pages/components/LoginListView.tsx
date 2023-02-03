@@ -31,6 +31,7 @@ const LoginListView: NextPage = () => {
     {name: "Google", img: "google", handler: useHandlerGoogle()},
   ];
 
+
   useEffect(() => {
     activate(injectedConnector);
   }, [account]);
@@ -39,7 +40,12 @@ const LoginListView: NextPage = () => {
     const params = {} as any;
 
     if (loginItem.name === "Email") {
-      setShowModal(true);
+      const emailElement = document.getElementById("emailId");
+      if (!emailElement && showModal) {
+        setShowModal(false);
+      } else {
+        setShowModal(true);
+      }
       return;
     }
     const executeHandler = loginItem.handler;

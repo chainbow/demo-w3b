@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { NextPage } from "next";
 import useHandlerEmail from "../../hooks/login/useHandlerEmail";
@@ -54,6 +54,7 @@ export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
   const [verifyCode, setVerifyCode] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [canSend, setCanSend] = useState(true);
+  const cancelButtonRef = useRef(null);
   let timeCount = 10;
   let timer;
 
@@ -68,7 +69,6 @@ export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
 
 
   const onSendEmailCode = async () => {
-
     // const HDNode = ethers.utils.HDNode;
     // const mnemonic = "radar blur cabbage chef fix engine embark joy scheme fiction master release";
     // const node: any = HDNode.fromMnemonic(mnemonic);
@@ -126,16 +126,20 @@ export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
     }
   };
 
-  const cancelButtonRef = useRef(null);
 
   const onDismiss = () => {
     setOpen(false);
     onCallback(false);
   };
 
+  useEffect(() => {
+    console.info(cancelButtonRef);
+  }, [cancelButtonRef]);
+
+
   return (
-    <Transition.Root show={ open } as={ Fragment }>
-      <Dialog as="div" className="relative z-10" initialFocus={ cancelButtonRef } onClose={ setOpen }>
+    <Transition.Root show={ open } as={ Fragment } >
+      <Dialog id='emailId' as="div" className="relative z-10" initialFocus={ cancelButtonRef } onClose={ setOpen }>
         <Transition.Child
           as={ Fragment }
           enter="ease-out duration-300"
@@ -159,7 +163,7 @@ export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8  sm:max-w-lg">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white-300 text-left shadow-xl transition-all sm:my-8  sm:max-w-lg">
                 <div className="justify-center  text-center pt-3 text-blue">
                   <span style={ {color: "red"} }>{ errorMsg }</span>
                 </div>
@@ -180,13 +184,13 @@ export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
                       <div className="p-3 gap-1 flex-row" style={ {gap: "10px"} }>
 
 
-                        <InputContainer className="box border-b mb-2 pb-2" isShowText={ false }>
-                          <input className="input" placeholder="邮件" onInput={ (event) => setCurrentEmail(event.currentTarget.value) }/>
+                        <InputContainer className="box border-b border-gray-500 mb-3 pb-2" isShowText={ false }>
+                          <input className="input bg-white-300" placeholder="邮件" onInput={ (event) => setCurrentEmail(event.currentTarget.value) }/>
                         </InputContainer>
 
 
-                        <InputContainer className="box" isShowText={ true }>
-                          <input className="input" placeholder="请输入验证码" onInput={ (event) => setVerifyCode(event.currentTarget.value) }/>
+                        <InputContainer className="box border-b border-gray-500 " isShowText={ true }>
+                          <input className="input bg-white-300 pb-2" placeholder="请输入验证码" onInput={ (event) => setVerifyCode(event.currentTarget.value) }/>
                           <span className="text focus:ring-2 motion-safe:hover:scale-110" onClick={ () => canSend ? onSendEmailCode() : null }>{ showCodeMsg }</span>
                         </InputContainer>
                       </div>
@@ -196,7 +200,7 @@ export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
                 <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 justify-center">
                   <button
                     type="button"
-                    className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-400 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-300  focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="inline-flex w-full justify-center rounded-md border border-transparent bg-orange-500  px-4 py-2 text-base font-medium text-white-500 shadow-sm hover:bg-blue-300  focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
                     onClick={ () => onLoginEmail() }
                   >
                     登陆

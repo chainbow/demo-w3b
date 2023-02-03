@@ -5,10 +5,20 @@ import { HomeDialog } from "../../index";
 
 
 export const Layout = ({children}) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
+
+  const onLoginCallback = (open) => {
+    const loginListElement = document.getElementById("loginListId");
+    if (!loginListElement && isOpen) {
+      setIsOpen(false);
+    } else {
+      setIsOpen(open);
+    }
+  };
+
   return (
     <>
-      <Header loginCallback={ (open) => setIsOpen(open) }/>
+      <Header loginCallback={ (open) => onLoginCallback(open) }/>
       { isOpen && <HomeDialog onDismissCallback={ (open) => setIsOpen(open) }/> }
       { children }
       <Footer/>
