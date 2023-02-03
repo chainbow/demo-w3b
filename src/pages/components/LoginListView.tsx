@@ -5,11 +5,11 @@ import useHandlerEmail from "../../hooks/login/useHandlerEmail";
 import useHandlerTwitter from "../../hooks/login/useHandlerTwitter";
 import useHandlerGoogle from "../../hooks/login/useHandlerGoogle";
 import { useEffect, useState } from "react";
-import EmailModal from "./Modal";
 import { InjectedConnector } from "@web3-react/injected-connector";
 import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
-import { Avatar, ImageList, ImageListItem } from "@mui/material";
+import { Avatar } from "@mui/material";
+import { EmailModal } from "./EmailModal";
 
 
 interface LoginMethod {
@@ -54,7 +54,7 @@ const LoginListView: NextPage = () => {
       <div style={ {display: "flex", alignItems: "center", gap: "70px", flexWrap: "wrap", justifyContent: "center"} }>
         { loginMethod.map((loginItem) => {
           return <div onClick={ () => onLogin(loginItem) } key={ `login_item_${ loginItem.name }` }
-                      className="cursor-pointer motion-safe:hover:scale-110"
+                      className="cursor-pointer motion-safe:hover:scale-110 focus:opacity-60 "
                       style={ {display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "5px"} }>
             <Avatar variant="square" alt="Remy Sharp" src={ `/${ loginItem.img }.png` } sx={ {width: 64, height: 64} }/>
             <span>{ loginItem.name }</span>
