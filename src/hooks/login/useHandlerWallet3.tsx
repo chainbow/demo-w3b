@@ -2,15 +2,14 @@ import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { providers } from "ethers";
-import sample from "lodash/sample";
 
 const useHandlerWallet3 = () => {
   const {activate} = useWeb3React<Web3Provider>();
 
   const getRpc = () => {
     const rpc: any = {};
-    rpc[1] = sample(providers[1]);
-    rpc[5] = sample(providers[5]);
+    rpc[1] =JSON.parse(JSON.stringify(providers[1]))
+    rpc[5] =JSON.parse(JSON.stringify(providers[5]))
     return rpc;
   };
 
