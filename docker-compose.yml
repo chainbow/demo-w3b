@@ -10,7 +10,12 @@ services:
       VIRTUAL_PORT: 3000
       LETSENCRYPT_HOST: demo.wallet3.net
       LETSENCRYPT_EMAIL: lilong@chainbow.io
-    command: npm run start
+    command:
+      - sh
+      - -c
+      - |
+         npm run db:push
+         npm run start
     ports:
       - "9099:3000"
     networks:
