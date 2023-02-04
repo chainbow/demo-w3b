@@ -1,7 +1,8 @@
 import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
-import { providers } from "ethers";
+import providers from '../../../providers.json'
+
 
 const useHandlerWallet3 = () => {
   const {activate} = useWeb3React<Web3Provider>();
