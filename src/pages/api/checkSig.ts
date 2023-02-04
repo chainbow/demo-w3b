@@ -1,14 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-
-const ethSigUtil = require("eth-sig-util");
+import ethSigUtil from "eth-sig-util";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   const {address, sig, provider} = req.query;
-  const msgParams = {data: "message", sig: sig};
+  const msgParams = {data: "message", sig: sig} as any;
   const checkSigResult = ethSigUtil.recoverPersonalSignature(msgParams);
 
   if (String(address).toLowerCase() !== checkSigResult) {
