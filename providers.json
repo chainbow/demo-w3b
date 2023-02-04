@@ -1,0 +1,131 @@
+{
+  "1": [
+    "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+    "https://mainnet.infura.io/v3/4618d111e84a483689ced419ea518af0"
+  ],
+  "3": [
+    "https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+    "https://ropsten.infura.io/v3/4618d111e84a483689ced419ea518af0"
+  ],
+  "4": [
+    "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+    "https://rinkeby.infura.io/v3/4618d111e84a483689ced419ea518af0"
+  ],
+  "5": [
+    "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+    "https://goerli.infura.io/v3/4618d111e84a483689ced419ea518af0"
+  ],
+  "42": [
+    "https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+    "https://kovan.infura.io/v3/4618d111e84a483689ced419ea518af0"
+  ],
+  "10": [
+    "https://optimism-mainnet.infura.io/v3/4618d111e84a483689ced419ea518af0",
+    "https://mainnet.optimism.io"
+  ],
+  "42161": [
+    "https://arb1.arbitrum.io/rpc",
+    "https://arbitrum-mainnet.infura.io/v3/4618d111e84a483689ced419ea518af0"
+  ],
+  "1088": [
+    "https://andromeda.metis.io/?owner=1088"
+  ],
+  "43114": [
+    "https://api.avax.network/ext/bc/C/rpc"
+  ],
+  "42220": [
+    "https://forno.celo.org"
+  ],
+  "66": [
+    "https://exchainrpc.okex.org"
+  ],
+  "100": [
+    "https://rpc.xdaichain.com"
+  ],
+  "128": [
+    "https://http-mainnet-node.huobichain.com",
+    "https://http-mainnet.hecochain.com",
+    "https://http-mainnet-node.defibox.com"
+  ],
+  "137": [
+    "https://polygon-rpc.com",
+    "https://matic-mainnet.chainstacklabs.com",
+    "https://matic-mainnet-full-rpc.bwarelabs.com",
+    "https://polygon-mainnet.infura.io/v3/4618d111e84a483689ced419ea518af0",
+    "https://matic-mainnet-archive-rpc.bwarelabs.com"
+  ],
+  "250": [
+    "https://rpc.ftm.tools",
+    "https://rpc.fantom.network",
+    "https://rpcapi.fantom.network"
+  ],
+  "80001": [
+    "https://rpc-mumbai.matic.today",
+    "https://polygon-mumbai.infura.io/v3/4618d111e84a483689ced419ea518af0",
+    "https://rpc-mumbai.maticvigil.com",
+    "https://matic-mumbai.chainstacklabs.com"
+  ],
+  "56": [
+    "https://bscrpc.com",
+    "https://bsc.mytokenpocket.vip",
+    "https://rpc.ankr.com/bsc",
+    "https://bsc-dataseed3.ninicoin.io",
+    "https://bsc-dataseed3.defibit.io",
+    "https://bsc-dataseed3.binance.org",
+    "https://bsc-dataseed.binance.org",
+    "https://binance.ankr.com",
+    "https://bsc-dataseed2.binance.org",
+    "https://bsc-dataseed1.ninicoin.io",
+    "https://bsc-dataseed2.ninicoin.io",
+    "https://bsc-dataseed4.binance.org",
+    "https://bsc-dataseed1.defibit.io"
+  ],
+  "10000": [
+    "https://smartbch.fountainhead.cash/mainnet",
+    "https://smartbch.greyh.at"
+  ],
+  "272": [
+    "https://stage2-api.zksync.dev/web3"
+  ],
+  "280": [
+    "https://zksync2-testnet.zksync.dev"
+  ],
+  "288": [
+    "https://mainnet.boba.network"
+  ],
+  "1666600000": [
+    "https://api.harmony.one"
+  ],
+  "1284": [
+    "https://moonbeam.api.onfinality.io/public",
+    "https://rpc.api.moonbeam.network"
+  ],
+  "1285": [
+    "https://moonriver.api.onfinality.io/public",
+    "https://rpc.moonriver.moonbeam.network"
+  ],
+  "1313161554": [
+    "https://mainnet.aurora.dev"
+  ],
+  "25": [
+    "https://evm-cronos.crypto.org"
+  ],
+  "2020": [
+    "https://api.roninchain.com/rpc"
+  ],
+  "8217": [
+    "https://public-node-api.klaytnapi.com/v1/cypress"
+  ],
+  "2152": [
+    "https://prod-mainnet.prod.findora.org:8545"
+  ],
+  "122": [
+    "https://rpc.fuse.io"
+  ],
+  "592": [
+    "https://rpc.astar.network:8545"
+  ],
+  "336": [
+    "https://rpc.shiden.astar.network:8545"
+  ]
+}

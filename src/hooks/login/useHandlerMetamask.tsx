@@ -14,7 +14,6 @@ const useHandlerMetamask = () => {
       const result: { address: string, index: number } = response.data.result;
       localStorage.setItem("address", result.address);
       window.location.reload();
-      console.info(`[response]`, response);
     } catch (error) {
 
     }

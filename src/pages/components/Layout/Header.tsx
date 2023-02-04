@@ -41,7 +41,7 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
   const onLogin = async () => {
     if (isLogin) {
       localStorage.removeItem("address");
-      await signOut();
+      signOut();
     } else {
       loginCallback(true);
     }
