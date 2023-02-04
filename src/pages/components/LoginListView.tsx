@@ -5,11 +5,11 @@ import useHandlerEmail from "../../hooks/login/useHandlerEmail";
 import useHandlerTwitter from "../../hooks/login/useHandlerTwitter";
 import useHandlerGoogle from "../../hooks/login/useHandlerGoogle";
 import { useEffect, useState } from "react";
-import { InjectedConnector } from "@web3-react/injected-connector";
-import { useWeb3React } from "@web3-react/core";
-// import type { Web3Provider } from "@ethersproject/providers";
 import { Avatar } from "@mui/material";
 import { EmailModal } from "./EmailModal";
+import { useWeb3React } from "@web3-react/core";
+import { Web3Provider } from "@ethersproject/providers";
+import { InjectedConnector } from "@web3-react/injected-connector";
 
 
 interface LoginMethod {
@@ -21,20 +21,17 @@ interface LoginMethod {
 
 const LoginListView: NextPage = () => {
   const [showModal, setShowModal] = useState(false);
+  const [requestMetamask, setRequestMetamask] = useState(false);
+  const {library, activate} = useWeb3React<Web3Provider>();
   const injectedConnector = new InjectedConnector({supportedChainIds: [1, 5]});
-  // const {activate, account} = useWeb3React<Web3Provider>();
-  const loginMethod: LoginMethod[] = [
+
+  const loginMethods: LoginMethod[] = [
     {name: "Wallet3", img: "wallet3", handler: useHandlerWallet3()},
     {name: "Metamask", img: "metamask", handler: useHandlerMetamask()},
     {name: "Email", img: "mail", handler: useHandlerEmail()},
     {name: "Twitter", img: "twitter", handler: useHandlerTwitter()},
     {name: "Google", img: "google", handler: useHandlerGoogle()},
   ];
-
-
-  // useEffect(() => {
-  //   activate(injectedConnector);
-  // }, [account]);
 
   const onLogin = async (loginItem: LoginMethod) => {
     const params = {} as any;
@@ -48,9 +45,21 @@ const LoginListView: NextPage = () => {
       }
       return;
     }
+    if (loginItem.name === "Metamask") {
+      await activate(injectedConnector);
+    }
+    if (!library) setRequestMetamask(true);
     const executeHandler = loginItem.handler;
     await executeHandler(params);
   };
+
+  useEffect(() => {
+    if (!requestMetamask || !library) return;
+    const loginItem: LoginMethod | undefined = loginMethods.find(item => item.name === "Metamask");
+    if (!loginItem) return;
+    console.info("[逻辑联机]");
+    onLogin(loginItem);
+  }, [requestMetamask]);
 
 
   return (
@@ -58,7 +67,7 @@ const LoginListView: NextPage = () => {
       { showModal && <EmailModal show={ true } onCallback={ (show) => setShowModal(show) }/> }
 
       <div style={ {display: "flex", alignItems: "center", gap: "70px", flexWrap: "wrap", justifyContent: "center"} }>
-        { loginMethod.map((loginItem) => {
+        { loginMethods.map((loginItem) => {
           return <div onClick={ () => onLogin(loginItem) } key={ `login_item_${ loginItem.name }` }
                       className="cursor-pointer motion-safe:hover:scale-110 focus:opacity-60 "
                       style={ {display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "5px"} }>

@@ -1,7 +1,7 @@
-version: '3.5'
-
+version: "3"
 services:
-  auth_client:
+
+ auth_client:
     image: auth_client:latest
     container_name: auth_client
     restart: always
@@ -19,3 +19,4 @@ services:
 networks:
   shared:
     external: true
+

@@ -1,22 +1,23 @@
 import { useWeb3React } from "@web3-react/core";
-// import type { Web3Provider } from "@ethersproject/providers";
-import { api } from "../../utils/api";
+import { Web3Provider } from "@ethersproject/providers";
+import axios from "axios";
 
 const useHandlerMetamask = () => {
-  // const {library, account} = useWeb3React<Web3Provider>();
+  const {library, account} = useWeb3React<Web3Provider>();
   return async () => {
-    // try {
-    //   if (!library) return null;
-    //   const web3Library: any = library;
-    //   const signMessage = await web3Library.getSigner(account).signMessage("message");
-    //   console.info(`[当前的signMessage]`, signMessage);
-    //   const address = await api.login.signMessage.useQuery({text: account ?? ""});
-    //   console.info(`[当前的address]`, address);
-    //   // await router.push("/success");
-    //   return null;
-    // } catch (error: any) {
-    //   return null;
-    // }
+    try {
+      if (!library) return;
+      const web3Library: any = library;
+      const signMessage = await web3Library.getSigner(account).signMessage("message");
+      // 请求服务器验证签名
+      const response = await axios.get("/api/checkSig", {params: {address: account, sig: signMessage, provider: "metamask"}});
+      const result: { address: string, index: number } = response.data.result;
+      localStorage.setItem("address", result.address);
+      window.location.reload();
+      console.info(`[response]`, response);
+    } catch (error) {
+
+    }
   };
 };
 
