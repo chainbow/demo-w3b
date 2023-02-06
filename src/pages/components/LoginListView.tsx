@@ -1,16 +1,15 @@
 import { NextPage } from "next";
-import useHandlerWallet3 from "../../hooks/login/useHandlerWallet3";
-import useHandlerEmail from "../../hooks/login/useHandlerEmail";
 import useHandlerTwitter from "../../hooks/login/useHandlerTwitter";
 import useHandlerGoogle from "../../hooks/login/useHandlerGoogle";
 import { useState } from "react";
 import { Avatar } from "@mui/material";
 import { EmailModal } from "./EmailModal";
-import useHandlerEthereum from "../../hooks/login/useHandlerEthereum";
-import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { getCsrfToken, signIn } from "next-auth/react";
 import { useAccount, useConnect, useNetwork, useSignMessage } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { SiweMessage } from "siwe";
+import { InjectedConnector as web3InjectedConnector } from "@web3-react/injected-connector";
+import { useWeb3React } from "@web3-react/core";
 
 
 interface LoginMethod {
@@ -28,50 +27,39 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
   const {signMessageAsync} = useSignMessage();
   const {chain} = useNetwork();
   const {address, isConnected} = useAccount();
+  const {activate} = useWeb3React();
   const {connect} = useConnect({
     connector: new InjectedConnector(),
   });
-  const {data: session, status} = useSession();
-
   const loginMethods: LoginMethod[] = [
-    {name: "Wallet3", img: "wallet3", handler: useHandlerWallet3()},
-    {name: "Metamask", img: "metamask", handler: useHandlerEthereum()},
-    {name: "Email", img: "mail", handler: useHandlerEmail()},
+    {name: "Wallet3", img: "wallet3", handler: () => loginByWallet3()},
+    {name: "Metamask", img: "metamask", handler: () => loginByEthereum()},
+    {name: "Email", img: "mail", handler: () => loginByEmail()},
     {name: "Twitter", img: "twitter", handler: useHandlerTwitter()},
     {name: "Google", img: "google", handler: useHandlerGoogle()},
   ];
 
   const onLogin = async (loginItem: LoginMethod) => {
     const params = {} as any;
-
-    if (loginItem.name === "Email") {
-      const emailElement = document.getElementById("emailId");
-      if (!emailElement && showModal) {
-        setShowModal(false);
-      } else {
-        setShowModal(true);
-      }
-      onCallback();
-      return;
-    }
-
-    // if (loginItem.name === "Wallet3" || loginItem.name === "Metamask") {
-    //   if (!isConnected) {
-    //     await connect();
-    //   }
-    //   await walletLogin();
-    //   onCallback();
-    //   return;
-    // }
-
-    await connect();
     const executeHandler = loginItem.handler;
     await executeHandler(params);
-    onCallback();
+    if (loginItem.name !== "Email") onCallback();
   };
 
-  const walletLogin = async () => {
+  const loginByWallet3 = async () => {
+    if (window.navigator?.userAgent?.indexOf("Wallet3") !== -1) {
+      const chainIds = [1, 5];
+      const web3Connector = new web3InjectedConnector({supportedChainIds: chainIds});
+      activate(web3Connector);
+    } else {
+      window.open(`https://wallet3.io/wc/?uri=wallet3://open?url=https://dagen.life`);
+    }
+  };
+
+
+  const loginByEthereum = async () => {
     try {
+      if (!isConnected) await connect();
       const callbackUrl = "/protected";
       const message = new SiweMessage({
         domain: window.location.host,
@@ -94,6 +82,12 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
     } catch (error) {
       window.alert(error);
     }
+  };
+
+  const loginByEmail = async () => {
+    const emailElement = document.getElementById("emailId");
+    const canShowModal = !emailElement && showModal;
+    setShowModal(!canShowModal);
   };
 
 
