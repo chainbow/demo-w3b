@@ -55,14 +55,14 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
       return;
     }
 
-    if (loginItem.name === "Wallet3" || loginItem.name === "Metamask") {
-      if (!isConnected) {
-        await connect();
-      }
-      await walletLogin();
-      onCallback();
-      return;
-    }
+    // if (loginItem.name === "Wallet3" || loginItem.name === "Metamask") {
+    //   if (!isConnected) {
+    //     await connect();
+    //   }
+    //   await walletLogin();
+    //   onCallback();
+    //   return;
+    // }
 
     await connect();
     const executeHandler = loginItem.handler;

@@ -1,14 +1,18 @@
-import { useAccount, useNetwork, useSignMessage } from "wagmi";
+import { useAccount, useConnect, useNetwork, useSignMessage } from "wagmi";
 import { SiweMessage } from "siwe";
 import { getCsrfToken, signIn } from "next-auth/react";
+import { InjectedConnector } from "wagmi/dist/connectors/injected";
 
 const useHandlerEthereum = () => {
   const {signMessageAsync} = useSignMessage();
   const {chain} = useNetwork();
-  const {address} = useAccount();
-
+  const {address, isConnected} = useAccount();
+  const {connect} = useConnect({
+    connector: new InjectedConnector(),
+  });
   return async () => {
     try {
+      if (!isConnected) await connect();
       const callbackUrl = "/protected";
       const message = new SiweMessage({
         domain: window.location.host,
