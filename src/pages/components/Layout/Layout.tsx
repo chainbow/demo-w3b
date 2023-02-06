@@ -3,10 +3,13 @@ import Footer from "./Footer";
 import Header from "./Header";
 import { HomeDialog } from "./HomeDialog";
 import useLoginMethod from "../../../hooks/login/useLoginMethod";
+import { useAccount } from "wagmi";
 
 export const Layout = ({children}) => {
   const [isOpen, setIsOpen] = useState(false);
   const {initLoginByWallet3} = useLoginMethod();
+  const {address, isConnected} = useAccount();
+
 
   const onLoginCallback = (open) => {
     const loginListElement = document.getElementById("loginListId");
@@ -18,7 +21,9 @@ export const Layout = ({children}) => {
   };
 
   useEffect(() => {
-    initLoginByWallet3();
+    const isForceQuit = localStorage.getItem("forceQuit");
+    if (isForceQuit && !JSON.parse(isForceQuit)) initLoginByWallet3();
+    console.info(`[isForceQuit]`,isForceQuit)
   }, []);
 
 

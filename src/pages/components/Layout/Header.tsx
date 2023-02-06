@@ -3,6 +3,7 @@ import { Link as LinkScroll } from "react-scroll";
 import LogoVPN from "../../../../public/assets/Logo.svg";
 import { NextPage } from "next";
 import { signOut, useSession } from "next-auth/react";
+import useLoginMethod from "../../../hooks/login/useLoginMethod";
 
 interface IHeader {
   loginCallback: (open: boolean) => void;
@@ -13,6 +14,7 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
   const {data: session} = useSession();
   const [activeLink, setActiveLink] = useState("");
   const [scrollActive, setScrollActive] = useState(false);
+  const {initLoginByWallet3} = useLoginMethod();
 
   useEffect(() => {
     window.addEventListener("scroll", () => {
@@ -27,9 +29,12 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
 
   const onLogin = async () => {
     if (isLogin) {
+      localStorage.setItem("forceQuit", "true");
       await signOut();
     } else {
-      loginCallback(true);
+      localStorage.setItem("forceQuit", "false");
+      const isWallet3 = await initLoginByWallet3();
+      if (!isWallet3) loginCallback(true);
     }
   };
 
