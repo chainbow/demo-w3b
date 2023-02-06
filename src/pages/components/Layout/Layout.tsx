@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 
 export const Layout = ({children}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const {initLoginByWallet3} = useLoginMethod();
+  const {initLoginByWallet3, loginByEthereum} = useLoginMethod();
   const {address, isConnected} = useAccount();
   const {data: session} = useSession();
 
@@ -23,10 +23,23 @@ export const Layout = ({children}) => {
   };
 
   useEffect(() => {
-    if (session === undefined || session) return
+    if (session === undefined || session) return;
     const isForceQuit = localStorage.getItem("forceQuit");
     if (isForceQuit && !JSON.parse(isForceQuit)) initLoginByWallet3();
+
   }, [session]);
+
+
+  useEffect(() => {
+    if (session?.user?.walletAddress && session.user?.walletAddress !== address && address) {
+      console.info(`[isForceQuit]`, address, isConnected, session!.user!.walletAddress);
+      initLoginByWallet3().then((isWallet3) => {
+        if (!isWallet3) {
+          loginByEthereum();
+        }
+      });
+    }
+  }, [address, session]);
 
 
   return (
