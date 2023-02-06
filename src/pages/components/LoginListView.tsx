@@ -43,17 +43,13 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
     const params = {} as any;
     const executeHandler = loginItem.handler;
     await executeHandler(params);
-    if (loginItem.name !== "Email") onCallback();
+    if (loginItem.name !== "Email" || loginItem.name !== "Wallet3") onCallback();
   };
 
   const loginByWallet3 = async () => {
-    if (window.navigator?.userAgent?.indexOf("Wallet3") !== -1) {
-      const chainIds = [1, 5];
-      const web3Connector = new web3InjectedConnector({supportedChainIds: chainIds});
-      activate(web3Connector);
-    } else {
-      window.open(`https://wallet3.io/wc/?uri=wallet3://open?url=https://dagen.life`);
-    }
+    const chainIds = [1, 5];
+    const web3Connector = new web3InjectedConnector({supportedChainIds: chainIds});
+    await activate(web3Connector);
   };
 
 
