@@ -7,6 +7,9 @@ import { useState } from "react";
 import { Avatar } from "@mui/material";
 import { EmailModal } from "./EmailModal";
 import useHandlerEthereum from "../../hooks/login/useHandlerEthereum";
+import { useSession } from "next-auth/react";
+import { useAccount, useConnect } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
 
 
 interface LoginMethod {
@@ -21,8 +24,13 @@ interface ILoginListView {
 
 const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
   const [showModal, setShowModal] = useState(false);
+  const {data: session, status} = useSession();
+  const {address, isConnected} = useAccount();
+  const {connect} = useConnect({
+    connector: new InjectedConnector(),
+  });
+
   const loginMethods: LoginMethod[] = [
-    {name: "Ethereum", img: "ethereum", handler: useHandlerEthereum()},
     {name: "Wallet3", img: "wallet3", handler: useHandlerWallet3()},
     {name: "Metamask", img: "metamask", handler: useHandlerEthereum()},
     {name: "Email", img: "mail", handler: useHandlerEmail()},
@@ -42,16 +50,18 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
       }
       return;
     }
+    await connect();
     const executeHandler = loginItem.handler;
     await executeHandler(params);
     onCallback();
   };
 
+
   return (
     <>
       { showModal && <EmailModal show={ true } onCallback={ (show) => setShowModal(show) }/> }
 
-      <div style={ {display: "flex", alignItems: "center", gap: "70px", flexWrap: "wrap", justifyContent: "center"} }>
+      <div className="gap-20 flex-1 justify-center items-center flex-wrap" style={ {display: "flex"} }>
         { loginMethods.map((loginItem) => {
           return <div onClick={ () => onLogin(loginItem) } key={ `login_item_${ loginItem.name }` }
                       className="cursor-pointer motion-safe:hover:scale-110 focus:opacity-60 "

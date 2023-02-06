@@ -1,7 +1,6 @@
-import { useAccount, useConnect, useNetwork, useSignMessage } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
+import { useAccount, useNetwork, useSignMessage } from "wagmi";
 import { SiweMessage } from "siwe";
-import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { getCsrfToken, signIn } from "next-auth/react";
 
 const useHandlerEthereum = () => {
   const {signMessageAsync} = useSignMessage();
