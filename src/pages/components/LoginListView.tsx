@@ -1,15 +1,13 @@
 import { NextPage } from "next";
 import useHandlerWallet3 from "../../hooks/login/useHandlerWallet3";
-import useHandlerMetamask from "../../hooks/login/useHandlerMetamask";
 import useHandlerEmail from "../../hooks/login/useHandlerEmail";
 import useHandlerTwitter from "../../hooks/login/useHandlerTwitter";
 import useHandlerGoogle from "../../hooks/login/useHandlerGoogle";
 import { useEffect, useState } from "react";
 import { Avatar } from "@mui/material";
 import { EmailModal } from "./EmailModal";
-import { useWeb3React } from "@web3-react/core";
-import { Web3Provider } from "@ethersproject/providers";
-import { InjectedConnector } from "@web3-react/injected-connector";
+import useHandlerEthereum from "../../hooks/login/useHandlerEthereum";
+import { useSession } from "next-auth/react";
 
 
 interface LoginMethod {
@@ -18,16 +16,18 @@ interface LoginMethod {
   handler: any
 }
 
+interface ILoginListView {
+  onCallback: () => void;
+}
 
-const LoginListView: NextPage = () => {
+const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
   const [showModal, setShowModal] = useState(false);
-  const [requestMetamask, setRequestMetamask] = useState(false);
-  const {library, activate} = useWeb3React<Web3Provider>();
-  const injectedConnector = new InjectedConnector({supportedChainIds: [1, 5]});
+  const {data: session, status} = useSession();
 
   const loginMethods: LoginMethod[] = [
+    {name: "Ethereum", img: "ethereum", handler: useHandlerEthereum()},
     {name: "Wallet3", img: "wallet3", handler: useHandlerWallet3()},
-    {name: "Metamask", img: "metamask", handler: useHandlerMetamask()},
+    {name: "Metamask", img: "metamask", handler: useHandlerEthereum()},
     {name: "Email", img: "mail", handler: useHandlerEmail()},
     {name: "Twitter", img: "twitter", handler: useHandlerTwitter()},
     {name: "Google", img: "google", handler: useHandlerGoogle()},
@@ -45,22 +45,14 @@ const LoginListView: NextPage = () => {
       }
       return;
     }
-    if (loginItem.name === "Metamask") {
-      await activate(injectedConnector);
-    }
-    if (!library) setRequestMetamask(true);
     const executeHandler = loginItem.handler;
     await executeHandler(params);
+    onCallback();
   };
 
   useEffect(() => {
-    if (!requestMetamask || !library) return;
-    const loginItem: LoginMethod | undefined = loginMethods.find(item => item.name === "Metamask");
-    if (!loginItem) return;
-    console.info("[逻辑联机]");
-    onLogin(loginItem);
-  }, [requestMetamask]);
-
+    console.info("[session]", session);
+  }, [session]);
 
   return (
     <>

@@ -26,7 +26,7 @@ export const HomeDialog: NextPage<IHomeDialog> = ({onDismissCallback}) => {
 
   return (
     <Transition.Root show={ open } as={ Fragment }>
-      <Dialog id='loginListId' as="div" className="relative z-10" initialFocus={ cancelButtonRef } onClose={ setOpen }>
+      <Dialog id="loginListId" as="div" className="relative z-10" initialFocus={ cancelButtonRef } onClose={ setOpen }>
         <Transition.Child
           as={ Fragment }
           enter="ease-out duration-300"
@@ -59,7 +59,7 @@ export const HomeDialog: NextPage<IHomeDialog> = ({onDismissCallback}) => {
                         选择登陆方式
                       </Dialog.Title>
                       <div className="mt-2" style={ {display: "flex", padding: "10px 0", alignItems: "center", justifyContent: "center", flexWrap: "wrap"} }>
-                        <LoginListView/>
+                        <LoginListView onCallback={ () => onDismiss() }/>
                       </div>
                     </div>
                   </div>
