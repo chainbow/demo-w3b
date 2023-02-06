@@ -43,7 +43,7 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
     const params = {} as any;
     const executeHandler = loginItem.handler;
     await executeHandler(params);
-    if (loginItem.name !== "Email" || loginItem.name !== "Wallet3") onCallback();
+    if (loginItem.name !== "Email") onCallback();
   };
 
   const loginByWallet3 = async () => {
