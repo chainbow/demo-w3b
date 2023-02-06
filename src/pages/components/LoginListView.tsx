@@ -56,6 +56,9 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
     }
 
     if (loginItem.name === "Wallet3" || loginItem.name === "Metamask") {
+      if (!isConnected) {
+        await connect();
+      }
       await walletLogin();
       onCallback();
       return;
