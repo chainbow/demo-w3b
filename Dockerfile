@@ -3,7 +3,7 @@ EXPOSE 3000
 WORKDIR /app
 RUN npm i -g pnpm
 COPY . ./
-RUN npm install  && pnpm build
+RUN pnpm install  && pnpm build
 
 FROM node:slim
 WORKDIR /app
