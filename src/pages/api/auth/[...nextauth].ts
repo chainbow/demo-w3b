@@ -140,8 +140,10 @@ export default async function auth(req: any, res: any) {
     callbacks: {
       async session({session, token, user}) {
         const userInfo = {accountId: "", type: "email"};
-
         if (token.sub) {
+          session.address = token.sub
+          session.user.name = token.sub
+          session.user.image = "https://www.fillmurray.com/128/128"
           userInfo.accountId = token.sub;
           userInfo.type = "wallet";
           session.user.walletAddress = token.sub;

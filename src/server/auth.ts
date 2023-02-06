@@ -11,6 +11,7 @@ import auth from "../pages/api/auth/[...nextauth]";
  **/
 declare module "next-auth" {
   interface Session extends DefaultSession {
+    address?: string;
     user: {
       id: string;
       walletAddress: string;
