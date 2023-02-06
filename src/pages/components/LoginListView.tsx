@@ -7,9 +7,10 @@ import { useState } from "react";
 import { Avatar } from "@mui/material";
 import { EmailModal } from "./EmailModal";
 import useHandlerEthereum from "../../hooks/login/useHandlerEthereum";
-import { useSession } from "next-auth/react";
-import { useAccount, useConnect } from "wagmi";
+import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { useAccount, useConnect, useNetwork, useSignMessage } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
+import { SiweMessage } from "siwe";
 
 
 interface LoginMethod {
@@ -24,11 +25,13 @@ interface ILoginListView {
 
 const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
   const [showModal, setShowModal] = useState(false);
-  const {data: session, status} = useSession();
+  const {signMessageAsync} = useSignMessage();
+  const {chain} = useNetwork();
   const {address, isConnected} = useAccount();
   const {connect} = useConnect({
     connector: new InjectedConnector(),
   });
+  const {data: session, status} = useSession();
 
   const loginMethods: LoginMethod[] = [
     {name: "Wallet3", img: "wallet3", handler: useHandlerWallet3()},
@@ -48,12 +51,46 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
       } else {
         setShowModal(true);
       }
+      onCallback();
       return;
     }
+
+    if (loginItem.name === "Wallet3" || loginItem.name === "Metamask") {
+      await walletLogin();
+      onCallback();
+      return;
+    }
+
     await connect();
     const executeHandler = loginItem.handler;
     await executeHandler(params);
     onCallback();
+  };
+
+  const walletLogin = async () => {
+    try {
+      const callbackUrl = "/protected";
+      const message = new SiweMessage({
+        domain: window.location.host,
+        address: address,
+        statement: "Sign in with Ethereum to the app.",
+        uri: window.location.origin,
+        version: "1",
+        chainId: chain?.id,
+        nonce: await getCsrfToken(),
+      });
+      const signature = await signMessageAsync({
+        message: message.prepareMessage(),
+      });
+      signIn("credentials", {
+        message: JSON.stringify(message),
+        redirect: false,
+        signature,
+        callbackUrl,
+      });
+    } catch (error) {
+      window.alert(error);
+    }
   };
 
 
