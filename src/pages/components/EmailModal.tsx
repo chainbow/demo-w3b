@@ -1,11 +1,10 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { NextPage } from "next";
-import useHandlerEmail from "../../hooks/login/useHandlerEmail";
 import axios from "axios";
 import styled from "styled-components";
 import { Avatar } from "@mui/material";
-import { ethers } from "ethers";
+import useLoginMethod from "../../hooks/login/useLoginMethod";
 
 export const InputContainer = styled.div<{ isShowText: boolean }>`
 
@@ -48,7 +47,8 @@ export interface IModal {
 }
 
 export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
-  const executeHandler = useHandlerEmail();
+  const {loginByEmail} = useLoginMethod();
+
   const [open, setOpen] = useState(true);
   const [showCodeMsg, setShowCodeMsg] = useState("获取验证码");
   const [currentEmail, setCurrentEmail] = useState("");
@@ -70,33 +70,13 @@ export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
 
 
   const onSendEmailCode = async () => {
-    // const HDNode = ethers.utils.HDNode;
-    // const mnemonic = "radar blur cabbage chef fix engine embark joy scheme fiction master release";
-    // const node: any = HDNode.fromMnemonic(mnemonic);
-    // const standardEthereum = node.derivePath("m/44'/60'/0'/0/0");
-    // console.info("standardEthereum", standardEthereum);
-    //
-    // // Get the extended private key
-    // const xpriv = node.extendedKey;
-    // console.info("xpriv", xpriv);
-    //
-    // // Get the extended public key
-    // const xpub = node.neuter().extnededKey;
-    // console.info("xpub", xpub);
-
-
-    // const bip32 = ethers.utils.HDNode.fromExtendedKey("xpub6C44gXqtPeBkher6yeZBhn5r36U5qh5z4W9GgFAQxZXVbsYiquW9JtVLHMurBfNR86M1A9nWSyMHtpjLHKehyCzd73vXE52YxTsCC9UejUk");
-    //
-    // const nextNode = bip32.derivePath(`0/1`);
-    // console.info("node", nextNode);
-
     const isValidEmail = checkEmail(currentEmail);
     if (!isValidEmail) return;
     setErrorMsg("");
     if (currentEmail) {
       setCanSend(false);
       setShowCodeMsg("已发送");
-      await executeHandler(currentEmail.trim());
+      await loginByEmail(currentEmail.trim());
       timer = setInterval(() => {
         timeCount--;
         if (timeCount <= 0) {
@@ -138,8 +118,8 @@ export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
 
 
   return (
-    <Transition.Root show={ open } as={ Fragment } >
-      <Dialog id='emailId' as="div" className="relative z-10" initialFocus={ cancelButtonRef } onClose={ setOpen }>
+    <Transition.Root show={ open } as={ Fragment }>
+      <Dialog id="emailId" as="div" className="relative z-10" initialFocus={ cancelButtonRef } onClose={ setOpen }>
         <Transition.Child
           as={ Fragment }
           enter="ease-out duration-300"
@@ -223,4 +203,4 @@ export const EmailModal: NextPage<IModal> = ({show = false, onCallback}) => {
   );
 };
 
-export default EmailModal
+export default EmailModal;
