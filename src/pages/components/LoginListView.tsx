@@ -3,11 +3,10 @@ import useHandlerWallet3 from "../../hooks/login/useHandlerWallet3";
 import useHandlerEmail from "../../hooks/login/useHandlerEmail";
 import useHandlerTwitter from "../../hooks/login/useHandlerTwitter";
 import useHandlerGoogle from "../../hooks/login/useHandlerGoogle";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Avatar } from "@mui/material";
 import { EmailModal } from "./EmailModal";
 import useHandlerEthereum from "../../hooks/login/useHandlerEthereum";
-import { useSession } from "next-auth/react";
 
 
 interface LoginMethod {
@@ -22,8 +21,6 @@ interface ILoginListView {
 
 const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
   const [showModal, setShowModal] = useState(false);
-  const {data: session, status} = useSession();
-
   const loginMethods: LoginMethod[] = [
     {name: "Ethereum", img: "ethereum", handler: useHandlerEthereum()},
     {name: "Wallet3", img: "wallet3", handler: useHandlerWallet3()},
@@ -49,10 +46,6 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
     await executeHandler(params);
     onCallback();
   };
-
-  useEffect(() => {
-    console.info("[session]", session);
-  }, [session]);
 
   return (
     <>

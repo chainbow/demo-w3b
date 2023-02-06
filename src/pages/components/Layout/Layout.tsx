@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import Footer from "./Footer";
 import Header from "./Header";
-import { HomeDialog } from "../../index";
-
+import { HomeDialog } from "./HomeDialog";
 
 export const Layout = ({children}) => {
   const [isOpen, setIsOpen] = useState(false);

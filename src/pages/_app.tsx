@@ -3,6 +3,7 @@ import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { api } from "../utils/api";
 import "../styles/globals.css";
+import { Web3ReactProvider } from "@web3-react/core";
 import { ExternalProvider, JsonRpcFetchFunc, Web3Provider } from "@ethersproject/providers";
 import { arbitrum, optimism, polygon } from "@wagmi/chains";
 import { configureChains, createClient, mainnet, WagmiConfig } from "wagmi";
@@ -31,12 +32,13 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
 
   return (
-    <WagmiConfig client={ client }>
-
-      <SessionProvider session={ session }>
-        <Component { ...pageProps } />
-      </SessionProvider>
-    </WagmiConfig>
+    <SessionProvider session={ session }>
+      <Web3ReactProvider getLibrary={ getLibrary }>
+        <WagmiConfig client={ client }>
+          <Component { ...pageProps } />
+        </WagmiConfig>
+      </Web3ReactProvider>
+    </SessionProvider>
   );
 };
 

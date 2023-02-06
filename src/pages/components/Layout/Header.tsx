@@ -12,9 +12,7 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
   const [isLogin, setIsLogin] = useState(false);
   const {data: session} = useSession();
   const [activeLink, setActiveLink] = useState("");
-  const [loginAddress, setLoginAddress] = useState("");
   const [scrollActive, setScrollActive] = useState(false);
-
 
   useEffect(() => {
     window.addEventListener("scroll", () => {
@@ -24,24 +22,12 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
 
 
   useEffect(() => {
-    const currentAddress = localStorage.getItem("address");
-    if (currentAddress) {
-      setLoginAddress(currentAddress);
-      setIsLogin(true);
-      return;
-    }
-    console.info(session);
-    if (session) {
-      setIsLogin(true);
-    } else {
-      setIsLogin(false);
-    }
+    setIsLogin(!!session);
   }, [session]);
 
   const onLogin = async () => {
     if (isLogin) {
-      localStorage.removeItem("address");
-      signOut();
+      await signOut();
     } else {
       loginCallback(true);
     }
@@ -126,8 +112,7 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
             <button
               onClick={ () => onLogin() }
               className="font-medium tracking-wide py-2 px-5 sm:px-8 border border-orange-500 text-orange-500 bg-white-500 outline-none rounded-l-full rounded-r-full capitalize hover:bg-orange-500 hover:text-white-500 transition-all hover:shadow-orange ">
-              { isLogin ? truncateHash(session?.user?.id ?? loginAddress ?? "", 4, 4) : "Login" }
-              { isLogin }
+              { isLogin ? truncateHash(session?.user?.id ?? session?.user?.walletAddress ?? "", 4, 4) : "Login" }
             </button>
 
           </div>

@@ -10,18 +10,8 @@ const Success: NextPage = () => {
   const onLogout = async () => {
     if (session) {
       await signOut();
-    } else {
-      await router.push("/");
     }
   };
-
-  useEffect(() => {
-    if (!session) {
-      router.push("/");
-    }
-  }, [session]);
-
-  console.log(session);
 
   return (
     <>

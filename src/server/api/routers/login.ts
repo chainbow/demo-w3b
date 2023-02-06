@@ -7,7 +7,6 @@ export const loginRouter = createTRPCRouter({
   signMessage: publicProcedure
     .input(z.object({text: z.string()}))
     .query(async ({input}) => {
-      // todo 验证签名
       const address = input.text;
       return {success: true, result: address};
     }),
