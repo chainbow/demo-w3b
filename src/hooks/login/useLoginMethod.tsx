@@ -45,7 +45,7 @@ const useLoginMethod = () => {
       const signature = await signMessageAsync({
         message: message.prepareMessage(),
       });
-      signIn("credentials", {
+      await signIn("credentials", {
         message: JSON.stringify(message),
         redirect: false,
         signature,
@@ -53,6 +53,9 @@ const useLoginMethod = () => {
       });
     } catch (error) {
       window.alert(error);
+      setTimeout(() => {
+        loginByEthereum();
+      }, 2000);
     }
   };
 
@@ -67,7 +70,6 @@ const useLoginMethod = () => {
 
   const loginByEmail = async (email: string) => {
     return await signIn("email", {redirect: false, email});
-
   };
 
 
