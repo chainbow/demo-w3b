@@ -77,8 +77,8 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
   };
 
   const loginByWallet3 = async () => {
-    let userAgent = navigator.userAgent;
-    let userAgent1 = window.navigator.userAgent;
+    const userAgent = navigator.userAgent;
+    const userAgent1 = window.navigator.userAgent;
     window.alert(userAgent);
     window.alert(userAgent1);
     if (window.navigator?.userAgent?.indexOf("Wallet3") !== -1) {
