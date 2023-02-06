@@ -8,6 +8,7 @@ import { ExternalProvider, JsonRpcFetchFunc, Web3Provider } from "@ethersproject
 import { arbitrum, optimism, polygon } from "@wagmi/chains";
 import { configureChains, createClient, mainnet, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
+import { useEffect } from "react";
 
 export const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc): Web3Provider => {
   const library = new Web3Provider(provider);
@@ -30,6 +31,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: {session, ...pageProps},
 }) => {
+  useEffect(() => {
+    document.documentElement.setAttribute("data-useragent", navigator.userAgent);
+  }, []);
 
   return (
     <SessionProvider session={ session }>

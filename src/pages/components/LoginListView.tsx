@@ -10,6 +10,32 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { SiweMessage } from "siwe";
 import { InjectedConnector as web3InjectedConnector } from "@web3-react/injected-connector";
 import { useWeb3React } from "@web3-react/core";
+import styled from "styled-components";
+import { Web3Provider } from "@ethersproject/providers";
+import axios from "axios";
+
+
+export const ListContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 70px;
+
+  .avatar {
+    width: 64px;
+    height: 64px;
+  }
+
+  @media screen and (max-width: 600px) {
+    gap: 40px;
+    .avatar {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+`;
 
 
 interface LoginMethod {
@@ -27,10 +53,14 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
   const {signMessageAsync} = useSignMessage();
   const {chain} = useNetwork();
   const {address, isConnected} = useAccount();
-  const {activate} = useWeb3React();
+  const {library, activate, account} = useWeb3React<Web3Provider>();
+  const chainIds = [1, 5];
+  const web3Connector = new web3InjectedConnector({supportedChainIds: chainIds});
   const {connect} = useConnect({
     connector: new InjectedConnector(),
   });
+
+
   const loginMethods: LoginMethod[] = [
     {name: "Wallet3", img: "wallet3", handler: () => loginByWallet3()},
     {name: "Metamask", img: "metamask", handler: () => loginByEthereum()},
@@ -47,9 +77,15 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
   };
 
   const loginByWallet3 = async () => {
-    const chainIds = [1, 5];
-    const web3Connector = new web3InjectedConnector({supportedChainIds: chainIds});
-    await activate(web3Connector);
+    let userAgent = navigator.userAgent;
+    let userAgent1 = window.navigator.userAgent;
+    window.alert(userAgent);
+    window.alert(userAgent1);
+    if (window.navigator?.userAgent?.indexOf("Wallet3") !== -1) {
+      await loginByEthereum();
+    } else {
+      window.open(`https://wallet3.io/wc/?uri=wallet3://open?url=https://dagen.life`);
+    }
   };
 
 
@@ -91,16 +127,16 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
     <>
       { showModal && <EmailModal show={ true } onCallback={ (show) => setShowModal(show) }/> }
 
-      <div className="gap-20 flex-1 justify-center items-center flex-wrap" style={ {display: "flex"} }>
+      <ListContainer>
         { loginMethods.map((loginItem) => {
           return <div onClick={ () => onLogin(loginItem) } key={ `login_item_${ loginItem.name }` }
                       className="cursor-pointer motion-safe:hover:scale-110 focus:opacity-60 "
                       style={ {display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "5px"} }>
-            <Avatar variant="square" alt="Remy Sharp" src={ `/${ loginItem.img }.png` } sx={ {width: 64, height: 64} }/>
+            <Avatar variant="square" alt="Remy Sharp" src={ `/${ loginItem.img }.png` } className="avatar"/>
             <span>{ loginItem.name }</span>
           </div>;
         }) }
-      </div>
+      </ListContainer>
 
 
     </>
