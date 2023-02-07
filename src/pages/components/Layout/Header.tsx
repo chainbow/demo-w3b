@@ -60,16 +60,9 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
     const isManualLogoutStr = localStorage.getItem("isManualLogout");
     const isAuto = isAutoLogin();
     const isManualLogout = JSON.parse(isManualLogoutStr ?? "false");
-    console.info("isAuto", isAuto, session, isConnected, address, isManualLogout);
     if (isManualLogout) return;
-    if (isAuto && !session && !isConnected && !address) {
-      loginByWallet3();
-    }
-
-    if (isAuto && !session && isConnected && address) {
-      authSign();
-    }
-
+    if (isAuto && !session && !isConnected && !address) loginByWallet3();
+    if (isAuto && !session && isConnected && address) authSign();
   }, [address, isConnected, session]);
 
 

@@ -15,21 +15,8 @@ const useLoginMethod = () => {
   };
 
 
-  // 在wallet3 钱包中默认屌用登陆方法
-  const initLoginByWallet3 = async () => {
-    if (window.navigator?.userAgent?.indexOf("Wallet3") !== -1) {
-      await loginByEthereum();
-      return true;
-    }
-    return false;
-  };
-
   const loginByWallet3 = async () => {
-    if (window.navigator?.userAgent?.indexOf("Wallet3") !== -1) {
-      await loginByEthereum();
-    } else {
-      window.open(`https://wallet3.io/wc/?uri=wallet3://open?url=https://dagen.life`);
-    }
+    await loginByEthereum();
   };
 
 
@@ -84,7 +71,7 @@ const useLoginMethod = () => {
   };
 
 
-  return {isAutoLogin, loginByWallet3, loginByEthereum, initLoginByWallet3, loginByWalletConnect, loginByTwitter, loginByGoogle, loginByEmail, authSign};
+  return {isAutoLogin, loginByWallet3, loginByEthereum, loginByWalletConnect, loginByTwitter, loginByGoogle, loginByEmail, authSign};
 };
 
 export default useLoginMethod;
