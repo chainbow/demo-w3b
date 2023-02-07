@@ -65,6 +65,12 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
     if (isAuto && !session && isConnected && address) authSign();
   }, [address, isConnected, session]);
 
+  // 切换账号
+  useEffect(() => {
+    const walletAddress = session?.user?.walletAddress;
+    if (address && isConnected && walletAddress && walletAddress != address) authSign();
+  }, [address, isConnected, session]);
+
 
   const truncateHash = (address: string, startLength = 4, endLength = 4) => {
     if (!address) return "";
