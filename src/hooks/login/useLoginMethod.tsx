@@ -12,8 +12,7 @@ const useLoginMethod = () => {
 
 
   const isAutoLogin = () => {
-    // return window.navigator?.userAgent?.indexOf("Wallet3") !== -1;
-    return true;
+    return window.navigator?.userAgent?.indexOf("Wallet3") !== -1;
   };
 
 
@@ -27,13 +26,11 @@ const useLoginMethod = () => {
   };
 
   const loginByWallet3 = async () => {
-    await loginByEthereum();
-
-    // if (window.navigator?.userAgent?.indexOf("Wallet3") !== -1) {
-    //   await loginByEthereum();
-    // } else {
-    //   window.open(`https://wallet3.io/wc/?uri=wallet3://open?url=https://dagen.life`);
-    // }
+    if (window.navigator?.userAgent?.indexOf("Wallet3") !== -1) {
+      await loginByEthereum();
+    } else {
+      window.open(`https://wallet3.io/wc/?uri=wallet3://open?url=https://dagen.life`);
+    }
   };
 
 
