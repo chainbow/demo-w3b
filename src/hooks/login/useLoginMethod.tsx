@@ -6,7 +6,6 @@ const useLoginMethod = () => {
   const {signMessageAsync} = useSignMessage();
   const {chain} = useNetwork();
   const {address, isConnected} = useAccount();
-  const {data: session} = useSession();
   const {connect, connectors} = useConnect();
   const {disconnect} = useDisconnect();
 

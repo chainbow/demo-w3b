@@ -71,7 +71,9 @@ const LoginListView: NextPage<ILoginListView> = ({onCallback}) => {
 
   // 签名链接之后才能继续签名
   useEffect(() => {
-    if (address && isConnected) authSign();
+    if (address && isConnected && !session) {
+      authSign();
+    }
     if (address && isConnected && session) onCallback();
 
   }, [address, isConnected, session]);
