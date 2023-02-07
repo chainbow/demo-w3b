@@ -4,6 +4,7 @@ import LogoVPN from "../../../../public/assets/Logo.svg";
 import { NextPage } from "next";
 import { signOut, useSession } from "next-auth/react";
 import useLoginMethod from "../../../hooks/login/useLoginMethod";
+import { useAccount, useDisconnect } from "wagmi";
 
 interface IHeader {
   loginCallback: (open: boolean) => void;
@@ -15,6 +16,8 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
   const [activeLink, setActiveLink] = useState("");
   const [scrollActive, setScrollActive] = useState(false);
   const {initLoginByWallet3} = useLoginMethod();
+  const {address, isConnected} = useAccount();
+  const {disconnect} = useDisconnect();
 
   useEffect(() => {
     window.addEventListener("scroll", () => {
@@ -31,6 +34,7 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
     if (isLogin) {
       localStorage.setItem("forceQuit", "true");
       await signOut();
+      await disconnect()
     } else {
       localStorage.setItem("forceQuit", "false");
       const isWallet3 = await initLoginByWallet3();
@@ -43,6 +47,15 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
 
     return `${ address.substring(0, startLength) }...${ address.substring(address.length - endLength) }`;
   };
+
+  useEffect(() => {
+    // if (isConnected && address) {
+    //   setIsLogin(true);
+    //   return;
+    // }
+    console.info(`[session]`,session)
+  }, [address, isConnected, isLogin]);
+
 
   return (
     <>
@@ -117,7 +130,7 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
             <button
               onClick={ () => onLogin() }
               className="font-medium tracking-wide py-2 px-5 sm:px-8 border border-orange-500 text-orange-500 bg-white-500 outline-none rounded-l-full rounded-r-full capitalize hover:bg-orange-500 hover:text-white-500 transition-all hover:shadow-orange ">
-              { isLogin ? truncateHash(session?.user?.id ?? session?.user?.walletAddress ?? "", 4, 4) : "Login" }
+              { isLogin ? truncateHash(session?.user?.id ?? session?.user?.walletAddress ?? address ?? "Disconnect", 4, 4) : "Login" }
             </button>
 
           </div>

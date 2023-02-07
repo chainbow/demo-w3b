@@ -5,10 +5,14 @@ import { api } from "../utils/api";
 import "../styles/globals.css";
 import { Web3ReactProvider } from "@web3-react/core";
 import { ExternalProvider, JsonRpcFetchFunc, Web3Provider } from "@ethersproject/providers";
-import { arbitrum, optimism, polygon } from "@wagmi/chains";
 import { configureChains, createClient, mainnet, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import { arbitrum, optimism, polygon } from "@wagmi/chains";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
+
 
 export const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc): Web3Provider => {
   const library = new Web3Provider(provider);
@@ -24,6 +28,22 @@ export const {chains, provider} = configureChains(
 
 const client = createClient({
   autoConnect: true,
+  connectors: [
+    new MetaMaskConnector({chains}),
+    new WalletConnectConnector({
+      chains,
+      options: {
+        qrcode: true,
+      },
+    }),
+    new InjectedConnector({
+      chains,
+      options: {
+        name: "Injected",
+        shimDisconnect: true,
+      },
+    }),
+  ],
   provider,
 });
 

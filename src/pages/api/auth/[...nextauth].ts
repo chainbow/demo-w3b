@@ -155,22 +155,22 @@ export default async function auth(req: any, res: any) {
         }
         console.info(`[session session]`, session, user, token);
 
-        // const myHeaders = new Headers();
-        // myHeaders.set("apikey", process.env.API_KEY as string);
-        // const myRequest = new Request(
-        //   `http://wallet3.net/api/address?accountId=${ userInfo.accountId }&provider=${ userInfo.type }`,
-        //   {
-        //     method: "GET",
-        //     headers: myHeaders,
-        //   },
-        // );
+        const myHeaders = new Headers();
+        myHeaders.set("apikey", process.env.API_KEY as string);
+        const myRequest = new Request(
+          `http://wallet3.net/api/address?accountId=${ userInfo.accountId }&provider=${ userInfo.type }`,
+          {
+            method: "GET",
+            headers: myHeaders,
+          },
+        );
 
-        // const res = await fetch(myRequest);
-        // const json = await res.json();
-        // console.log(json);
-        // if (userInfo.type !== "wallet") {
-        //   session.user.walletAddress = json.address;
-        // }
+        const res = await fetch(myRequest);
+        const json = await res.json();
+        console.log(json);
+        if (userInfo.type !== "wallet") {
+          session.user.walletAddress = json.address;
+        }
         return session;
       },
     },

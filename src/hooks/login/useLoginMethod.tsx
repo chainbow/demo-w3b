@@ -1,17 +1,14 @@
 import { getCsrfToken, signIn, useSession } from "next-auth/react";
 import { SiweMessage } from "siwe";
-import { useAccount, useConnect, useNetwork, useSignMessage } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
-
+import { useAccount, useConnect, useDisconnect, useNetwork, useSignMessage } from "wagmi";
 
 const useLoginMethod = () => {
   const {signMessageAsync} = useSignMessage();
   const {chain} = useNetwork();
   const {address, isConnected} = useAccount();
   const {data: session} = useSession();
-  const {connect} = useConnect({
-    connector: new InjectedConnector(),
-  });
+  const {connect, connectors} = useConnect();
+  const {disconnect} = useDisconnect();
 
 
   // 在wallet3 钱包中默认屌用登陆方法
@@ -33,11 +30,24 @@ const useLoginMethod = () => {
 
 
   const loginByEthereum = async () => {
+    const connector = connectors.find(item => item.name === "Injected");
+    if (isConnected) await disconnect();
+    await connect({connector});
+  };
+
+
+  const loginByWalletConnect = async () => {
+    const walletConnectConnector = connectors.find(item => item.name === "WalletConnect");
+    console.info(`[loginByWalletConnect connectors]`, walletConnectConnector, isConnected);
+    if (isConnected) await disconnect();
+    await connect({connector: walletConnectConnector});
+  };
+
+
+  const authSign = async () => {
     try {
-      localStorage.setItem("walletRetry", "false");
-      console.info(`retr false`);
-      if (!isConnected) await connect();
       const callbackUrl = "/protected";
+      console.info(`retry remove`, address);
       const message = new SiweMessage({
         domain: window.location.host,
         address: address,
@@ -47,6 +57,7 @@ const useLoginMethod = () => {
         chainId: chain?.id,
         nonce: await getCsrfToken(),
       });
+      console.info(`retry remove`, message);
       const signature = await signMessageAsync({
         message: message.prepareMessage(),
       });
@@ -59,18 +70,7 @@ const useLoginMethod = () => {
       console.info(`retry remove`);
       localStorage.removeItem("walletRetry");
     } catch (error: any) {
-      console.info("[error]", error.message);
-      if (error.message.trim() !== "Connector not found") return;
-      const item = localStorage.getItem("walletRetry");
-      console.info(`retry error`, item);
-      if (item && !JSON.parse(item)) {
-        localStorage.setItem("walletRetry", "true");
-        setTimeout(async () => {
-          await loginByEthereum();
-          console.info(`retry setTimeout`);
-        }, 1000);
 
-      }
     }
   };
 
@@ -88,7 +88,7 @@ const useLoginMethod = () => {
   };
 
 
-  return {loginByWallet3, loginByEthereum, initLoginByWallet3, loginByTwitter, loginByGoogle, loginByEmail};
+  return {loginByWallet3, loginByEthereum, initLoginByWallet3, loginByWalletConnect, loginByTwitter, loginByGoogle, loginByEmail, authSign};
 };
 
 export default useLoginMethod;
