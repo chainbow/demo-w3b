@@ -11,6 +11,12 @@ const useLoginMethod = () => {
   const {disconnect} = useDisconnect();
 
 
+  const isAutoLogin = () => {
+    // return window.navigator?.userAgent?.indexOf("Wallet3") !== -1;
+    return true;
+  };
+
+
   // 在wallet3 钱包中默认屌用登陆方法
   const initLoginByWallet3 = async () => {
     if (window.navigator?.userAgent?.indexOf("Wallet3") !== -1) {
@@ -21,11 +27,13 @@ const useLoginMethod = () => {
   };
 
   const loginByWallet3 = async () => {
-    if (window.navigator?.userAgent?.indexOf("Wallet3") !== -1) {
-      await loginByEthereum();
-    } else {
-      window.open(`https://wallet3.io/wc/?uri=wallet3://open?url=https://dagen.life`);
-    }
+    await loginByEthereum();
+
+    // if (window.navigator?.userAgent?.indexOf("Wallet3") !== -1) {
+    //   await loginByEthereum();
+    // } else {
+    //   window.open(`https://wallet3.io/wc/?uri=wallet3://open?url=https://dagen.life`);
+    // }
   };
 
 
@@ -38,40 +46,8 @@ const useLoginMethod = () => {
 
   const loginByWalletConnect = async () => {
     const walletConnectConnector = connectors.find(item => item.name === "WalletConnect");
-    console.info(`[loginByWalletConnect connectors]`, walletConnectConnector, isConnected);
     if (isConnected) await disconnect();
     await connect({connector: walletConnectConnector});
-  };
-
-
-  const authSign = async () => {
-    try {
-      const callbackUrl = "/protected";
-      console.info(`retry remove`, address);
-      const message = new SiweMessage({
-        domain: window.location.host,
-        address: address,
-        statement: "Sign in with Ethereum to the app.",
-        uri: window.location.origin,
-        version: "1",
-        chainId: chain?.id,
-        nonce: await getCsrfToken(),
-      });
-      console.info(`retry remove`, message);
-      const signature = await signMessageAsync({
-        message: message.prepareMessage(),
-      });
-      await signIn("credentials", {
-        message: JSON.stringify(message),
-        redirect: false,
-        signature,
-        callbackUrl,
-      });
-      console.info(`retry remove`);
-      localStorage.removeItem("walletRetry");
-    } catch (error: any) {
-
-    }
   };
 
 
@@ -84,11 +60,35 @@ const useLoginMethod = () => {
   };
 
   const loginByEmail = async (email: string) => {
-    return await signIn("email", {redirect: false, email});
+    await signIn("email", {redirect: false, email});
+  };
+
+  const authSign = async () => {
+    try {
+      const callbackUrl = "/protected";
+      const message = new SiweMessage({
+        domain: window.location.host,
+        address: address,
+        statement: "Sign in with Ethereum to the app.",
+        uri: window.location.origin,
+        version: "1",
+        chainId: chain?.id,
+        nonce: await getCsrfToken(),
+      });
+      const signature = await signMessageAsync({message: message.prepareMessage()});
+      await signIn("credentials", {
+        message: JSON.stringify(message),
+        redirect: false,
+        signature,
+        callbackUrl,
+      });
+    } catch (error: any) {
+      console.error("[auth error]", error.message);
+    }
   };
 
 
-  return {loginByWallet3, loginByEthereum, initLoginByWallet3, loginByWalletConnect, loginByTwitter, loginByGoogle, loginByEmail, authSign};
+  return {isAutoLogin, loginByWallet3, loginByEthereum, initLoginByWallet3, loginByWalletConnect, loginByTwitter, loginByGoogle, loginByEmail, authSign};
 };
 
 export default useLoginMethod;

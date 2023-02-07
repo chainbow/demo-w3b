@@ -15,7 +15,7 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
   const {data: session} = useSession();
   const [activeLink, setActiveLink] = useState("");
   const [scrollActive, setScrollActive] = useState(false);
-  const {initLoginByWallet3} = useLoginMethod();
+  const {isAutoLogin, loginByWallet3, authSign} = useLoginMethod();
   const {address, isConnected} = useAccount();
   const {disconnect} = useDisconnect();
 
@@ -32,30 +32,51 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
 
   const onLogin = async () => {
     if (isLogin) {
-      localStorage.setItem("forceQuit", "true");
-      await signOut();
-      await disconnect()
+      await logout();
     } else {
-      localStorage.setItem("forceQuit", "false");
-      const isWallet3 = await initLoginByWallet3();
-      if (!isWallet3) loginCallback(true);
+      await login();
     }
   };
 
-  const truncateHash = (address: string, startLength = 4, endLength = 4) => {
-    if (!address) return "";
-
-    return `${ address.substring(0, startLength) }...${ address.substring(address.length - endLength) }`;
+  const login = async () => {
+    const isAuto = isAutoLogin();
+    if (isAuto) {
+      localStorage.removeItem("isManualLogout");
+      await loginByWallet3();
+    } else {
+      loginCallback(true);
+    }
   };
 
-  useEffect(() => {
-    // if (isConnected && address) {
-    //   setIsLogin(true);
-    //   return;
-    // }
-    console.info(`[session]`,session)
-  }, [address, isConnected, isLogin]);
+  const logout = async () => {
+    localStorage.setItem("isManualLogout", "true");
+    await signOut();
+    await disconnect();
+  };
 
+
+  // 自动登陆
+  useEffect(() => {
+    const isManualLogoutStr = localStorage.getItem("isManualLogout");
+    const isAuto = isAutoLogin();
+    const isManualLogout = JSON.parse(isManualLogoutStr ?? "false");
+    console.info("isAuto", isAuto, session, isConnected, address, isManualLogout);
+    if (isManualLogout) return;
+    if (isAuto && !session && !isConnected && !address) {
+      loginByWallet3();
+    }
+
+    if (isAuto && !session && isConnected && address) {
+      authSign();
+    }
+
+  }, [address, isConnected, session]);
+
+
+  const truncateHash = (address: string, startLength = 4, endLength = 4) => {
+    if (!address) return "";
+    return `${ address.substring(0, startLength) }...${ address.substring(address.length - endLength) }`;
+  };
 
   return (
     <>
