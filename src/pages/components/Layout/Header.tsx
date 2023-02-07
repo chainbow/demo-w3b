@@ -67,7 +67,7 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
     }
 
     if (isAuto && !session && isConnected && address) {
-      // authSign();
+      authSign();
     }
 
   }, [address, isConnected, session]);
