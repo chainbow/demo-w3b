@@ -7,11 +7,10 @@ import { Web3ReactProvider } from "@web3-react/core";
 import { ExternalProvider, JsonRpcFetchFunc, Web3Provider } from "@ethersproject/providers";
 import { configureChains, createClient, mainnet, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
-import React, { useEffect } from "react";
+import React from "react";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { arbitrum, optimism, polygon } from "@wagmi/chains";
-import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 
 
 export const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc): Web3Provider => {
@@ -26,24 +25,13 @@ export const {chains, provider} = configureChains(
   [publicProvider()],
 );
 
+export const walletConnector = new WalletConnectConnector({chains, options: {qrcode: true}});
+
+export const injectedConnector = new InjectedConnector({chains, options: {name: "VPN STORE"}});
+
 const client = createClient({
   autoConnect: true,
-  connectors: [
-    new MetaMaskConnector({chains}),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        qrcode: true,
-      },
-    }),
-    new InjectedConnector({
-      chains,
-      options: {
-        name: "Injected",
-        shimDisconnect: true,
-      },
-    }),
-  ],
+  connectors: [walletConnector, injectedConnector],
   provider,
 });
 
@@ -51,10 +39,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: {session, ...pageProps},
 }) => {
-  useEffect(() => {
-    document.documentElement.setAttribute("data-useragent", navigator.userAgent);
-  }, []);
-
   return (
     <SessionProvider session={ session }>
       <Web3ReactProvider getLibrary={ getLibrary }>

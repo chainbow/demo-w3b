@@ -25,7 +25,6 @@ export const Header: NextPage<IHeader> = ({loginCallback}) => {
     });
   }, []);
 
-
   useEffect(() => {
     setIsLogin(!!session);
   }, [session]);

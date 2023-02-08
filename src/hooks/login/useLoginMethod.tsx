@@ -1,12 +1,13 @@
-import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { getCsrfToken, signIn } from "next-auth/react";
 import { SiweMessage } from "siwe";
 import { useAccount, useConnect, useDisconnect, useNetwork, useSignMessage } from "wagmi";
+import { injectedConnector, walletConnector } from "../../pages/_app";
 
 const useLoginMethod = () => {
   const {signMessageAsync} = useSignMessage();
   const {chain} = useNetwork();
   const {address, isConnected} = useAccount();
-  const {connect, connectors} = useConnect();
+  const {connect} = useConnect();
   const {disconnect} = useDisconnect();
 
 
@@ -21,16 +22,14 @@ const useLoginMethod = () => {
 
 
   const loginByEthereum = async () => {
-    const connector = connectors.find(item => item.name === "Injected");
     if (isConnected) await disconnect();
-    await connect({connector});
+    await connect({connector: injectedConnector});
   };
 
 
   const loginByWalletConnect = async () => {
-    const walletConnectConnector = connectors.find(item => item.name === "WalletConnect");
     if (isConnected) await disconnect();
-    await connect({connector: walletConnectConnector});
+    await connect({connector: walletConnector});
   };
 
 
