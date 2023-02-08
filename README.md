@@ -1,28 +1,27 @@
-# Create T3 App
+## Examples
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+- src/hooks/login/useLoginMethod.tsx  - Encapsulates all login methods
+- src/pages/_app.tsx - Configure the environment for web3 login
+- src/pages/components/Layout/Header.tsx - Login logic entry
+- src/pages/components/LoginListView.tsx - Login method selection page
+- src/pages/components/EmailModal.tsx - Mail login UI
+- src/pages/api/auth/[...nextauth].ts  - Verify that the account is legitimate
 
-## What's next? How do I make an app with this?
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Features
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+- Easy login with web3 wallet
+- Easy to login with google twitter email account
+- After successful login using Google twitter email, an address will be issued
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
 
-## Learn More
+## Quick Start Guide
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+```bash
+ pnpm install
+ 
+ pnpm db:push
+ 
+ pnpm dev
+ 
+```

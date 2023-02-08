@@ -148,12 +148,11 @@ export default async function auth(req: any, res: any) {
           userInfo.type = "wallet";
           session.user.walletAddress = token.sub;
         }
+
         if (session.user && user?.id) {
           session.user.id = user.id;
           userInfo.accountId = user.id;
-          // session.user.role = user.role; <-- put other properties on the session here
         }
-        console.info(`[session session]`, session, user, token);
 
         const myHeaders = new Headers();
         myHeaders.set("apikey", process.env.API_KEY as string);
@@ -167,7 +166,6 @@ export default async function auth(req: any, res: any) {
 
         const res = await fetch(myRequest);
         const json = await res.json();
-        console.log(json);
         if (userInfo.type !== "wallet") {
           session.user.walletAddress = json.address;
         }
