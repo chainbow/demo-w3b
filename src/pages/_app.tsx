@@ -27,7 +27,7 @@ export const {chains, provider} = configureChains(
 
 export const walletConnector = new WalletConnectConnector({chains, options: {qrcode: true}});
 
-export const injectedConnector = new InjectedConnector({chains, options: {name: "VPN STORE"}});
+export const injectedConnector = new InjectedConnector({chains, options: {name: "VPN STORE", shimChainChangedDisconnect: true}});
 
 const client = createClient({
   autoConnect: true,
