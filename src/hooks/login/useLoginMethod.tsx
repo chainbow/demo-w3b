@@ -17,7 +17,11 @@ const useLoginMethod = () => {
 
 
   const loginByWallet3 = async () => {
-    await loginByEthereum();
+    if (isAutoLogin()) {
+      await loginByEthereum();
+    } else {
+      window.open(`https://wallet3.io/wc/?uri=wallet3://open?url=https://dagen.life`);
+    }
   };
 
 
