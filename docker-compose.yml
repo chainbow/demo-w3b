@@ -5,6 +5,7 @@ services:
     image: demo-w3b:latest
     container_name: demo-w3b
     restart: always
+    build: ./
     environment:
       VIRTUAL_HOST: demo.wallet3.net
       VIRTUAL_PORT: 3000
