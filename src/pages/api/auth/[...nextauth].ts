@@ -10,7 +10,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "../../../server/db";
 
 function html(params: { token: string }) {
-  const {token} = params;
+  const { token } = params;
 
   return `
         <body>
@@ -23,7 +23,7 @@ function html(params: { token: string }) {
           <div>Here is your dagen verification code. Please enter it soon before it expires in 10 minutes:</div>
           <br />
           <div style="font-size: 22px;">
-            <strong>${ token }</strong>
+            <strong>${token}</strong>
           </div>
           <br />
           <div>If you did not initiate this operation, please ignore it.</div>
@@ -42,84 +42,163 @@ function text({
   host: string;
   token: string;
 }) {
-  return `Sign in to ${ host }\n${ url }\n${ token }\n`;
+  return `Sign in to ${host}\n${url}\n${token}\n`;
 }
 
+export async function sendVerificationRequest(params) {
+  const { identifier, url, token } = params
+
+  const { host } = new URL(url)
+  const transport = createTransport({
+    // @ts-ignore
+    host: process.env.EMAIL_SERVER_HOST,
+    port: process.env.EMAIL_SERVER_PORT,
+    auth: {
+      user: process.env.EMAIL_SERVER_USER, pass: process.env.EMAIL_SERVER_PASSWORD
+    }
+  })
+  const result = await transport.sendMail({
+    to: identifier,
+    from: process.env.EMAIL_FROM,
+    subject: `Sign in to ${host}`,
+    text: text({ url, host, token }),
+    html: html({ token }),
+  })
+  const failed = result.rejected.concat(result.pending).filter(Boolean)
+  if (failed.length) {
+    throw new Error(`Email(s) (${failed.join(', ')}) could not be sent`)
+  }
+}
+
+export function generateVerificationToken() {
+  const n = Math.floor(Math.random() * 1000000).toString()
+  if (n.length < 6) return '0'.repeat(6 - n.length) + n
+  else return n
+}
+
+async function linkWallet3Business(accountId: string) {
+  const myHeaders = new Headers();
+  myHeaders.set("apikey", process.env.API_KEY as string);
+  const myRequest = new Request(
+    `http://wallet3.net/api/address?accountId=${accountId}`,
+    {
+      method: "GET",
+      headers: myHeaders,
+    },
+  );
+
+  try {
+    const res = await fetch(myRequest);
+    const json = await res.json();
+    return json.address
+  } catch (error) {
+    console.error("🚀 ~ file: auth.ts:119 ~ linkWallet3Business ~ error:", error)
+    return null
+  }
+}
 
 export default async function auth(req: any, res: any) {
-  const providers = [
-    CredentialsProvider({
-      name: "Ethereum",
-      credentials: {
-        message: {
-          label: "Message",
-          type: "text",
-          placeholder: "0x0",
-        },
-        signature: {
-          label: "Signature",
-          type: "text",
-          placeholder: "0x0",
-        },
+  const providers = [CredentialsProvider({
+    // ! Don't add this
+    // - it will assume more than one auth provider 
+    // - and redirect to a sign-in page meant for oauth
+    // - id: 'siwe', 
+    name: "Ethereum",
+    type: "credentials", // default for Credentials
+    // Default values if it was a form
+    credentials: {
+      message: {
+        label: "Message",
+        type: "text",
+        placeholder: "0x0",
       },
-      async authorize(credentials) {
-        try {
-          const siwe = new SiweMessage(JSON.parse(credentials?.message || "{}"));
-          const nextAuthUrl = new URL(process.env.NEXTAUTH_URL ?? "");
+      signature: {
+        label: "Signature",
+        type: "text",
+        placeholder: "0x0",
+      },
+    },
+    authorize: async (credentials) => {
+      try {
+        const siwe = new SiweMessage(JSON.parse(credentials?.message as string ?? "{}") as Partial<SiweMessage>);
+        const fields = await siwe.validate(credentials?.signature || "")
 
-          const result = await siwe.verify({
-            signature: credentials?.signature || "",
-            domain: nextAuthUrl.host,
-            nonce: await getCsrfToken({req}),
+        // Check if user exists
+        let user = await prisma.user.findUnique({
+          where: {
+            walletAddress: fields.address
+          },
+          include: { accounts: true }
+        });
+        // Create new user if doesn't exist
+        if (!user) {
+          const newUser = await prisma.user.create({
+            data: {
+              walletAddress: fields.address
+            }
+          });
+          // create account
+          await prisma.account.create({
+            data: {
+              userId: newUser.id,
+              type: "credentials",
+              provider: "Ethereum",
+              providerAccountId: fields.address
+            }
           });
 
-          if (result.success) {
-            return {
-              id: siwe.address,
-            };
-          }
-          return null;
-        } catch (e) {
-          return null;
+          user = await prisma.user.findUnique({
+            where: {
+              walletAddress: fields.address
+            },
+            include: { accounts: true }
+          });
         }
+
+        return user
+      } catch (error) {
+        // Uncomment or add logging if needed
+        console.error({ error });
+        return null;
+      }
+    },
+  }),
+  Google({
+    clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+  }),
+  Twitter({
+    clientId: process.env.TWITTER_ID ?? "",
+    clientSecret: process.env.TWITTER_SECRET ?? "",
+    version: "2.0",
+  }),
+  Email({
+    server: {
+      host: process.env.EMAIL_SERVER_HOST,
+      port: Number(process.env.EMAIL_SERVER_PORT),
+      auth: {
+        user: process.env.EMAIL_SERVER_USER,
+        pass: process.env.EMAIL_SERVER_PASSWORD,
       },
-    }),
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-    }),
-    Twitter({
-      clientId: process.env.TWITTER_ID ?? "",
-      clientSecret: process.env.TWITTER_SECRET ?? "",
-      version: "2.0",
-    }),
-    Email({
-      server: {
-        host: process.env.EMAIL_SERVER_HOST,
-        port: Number(process.env.EMAIL_SERVER_PORT),
-        auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD,
-        },
-      },
-      from: process.env.EMAIL_FROM,
-      async sendVerificationRequest(params) {
-        const {identifier, url, provider, theme, token} = params;
-        const {host} = new URL(url);
-        const transport = createTransport(provider.server);
-        const result = await transport.sendMail({
-          to: identifier,
-          from: provider.from,
-          subject: `Sign in to ${ host }`,
-          text: text({url, host, token}),
-          html: html({token}),
-        });
-        const failed = result.rejected.concat(result.pending).filter(Boolean);
-        if (failed.length) {
-          throw new Error(`Email(s) (${ failed.join(", ") }) could not be sent`);
-        }
-      },
-    }),
+    },
+    from: process.env.EMAIL_FROM,
+    async sendVerificationRequest(params) {
+      const { identifier, url, provider, theme, token } = params;
+      const { host } = new URL(url);
+      const transport = createTransport(provider.server);
+      const result = await transport.sendMail({
+        to: identifier,
+        from: provider.from,
+        subject: `Sign in to ${host}`,
+        text: text({ url, host, token }),
+        html: html({ token }),
+      });
+      const failed = result.rejected.concat(result.pending).filter(Boolean);
+      if (failed.length) {
+        throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
+      }
+    },
+  }),
   ];
 
   const isDefaultSigninPage =
@@ -138,37 +217,8 @@ export default async function auth(req: any, res: any) {
     },
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
-      async session({session, token, user}) {
-        const userInfo = {accountId: "", type: "email"};
-        if (token.sub) {
-          session.address = token.sub
-          session.user.name = token.sub
-          session.user.image = "https://www.fillmurray.com/128/128"
-          userInfo.accountId = token.sub;
-          userInfo.type = "wallet";
-          session.user.walletAddress = token.sub;
-        }
-
-        if (session.user && user?.id) {
-          session.user.id = user.id;
-          userInfo.accountId = user.id;
-        }
-
-        const myHeaders = new Headers();
-        myHeaders.set("apikey", process.env.API_KEY as string);
-        const myRequest = new Request(
-          `http://wallet3.net/api/address?accountId=${ userInfo.accountId }&provider=${ userInfo.type }`,
-          {
-            method: "GET",
-            headers: myHeaders,
-          },
-        );
-
-        const res = await fetch(myRequest);
-        const json = await res.json();
-        if (userInfo.type !== "wallet") {
-          session.user.walletAddress = json.address;
-        }
+      async session({ session, token, user }) {
+        if (session.user) session.user.walletAddress = await linkWallet3Business(token.sub)
         return session;
       },
     },

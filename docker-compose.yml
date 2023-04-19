@@ -1,9 +1,9 @@
 version: "3"
 services:
 
- auth_client:
-    image: auth_client:latest
-    container_name: auth_client
+  demo-w3b:
+    image: demo-w3b:latest
+    container_name: demo-w3b
     restart: always
     environment:
       VIRTUAL_HOST: demo.wallet3.net
@@ -14,8 +14,8 @@ services:
       - sh
       - -c
       - |
-         npm run db:push
-         npm run start
+        npm run db:push
+        npm run start
     ports:
       - "9099:3000"
     networks:
@@ -24,4 +24,3 @@ services:
 networks:
   shared:
     external: true
-
