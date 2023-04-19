@@ -1,12 +1,11 @@
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getCsrfToken } from "next-auth/react";
-import { SiweMessage } from "siwe";
+import Email from "next-auth/providers/email";
 import Google from "next-auth/providers/google";
 import Twitter from "next-auth/providers/twitter";
-import Email from "next-auth/providers/email";
 import { createTransport } from "nodemailer";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { SiweMessage } from "siwe";
 import { prisma } from "../../../server/db";
 
 function html(params: { token: string }) {
@@ -127,31 +126,14 @@ export default async function auth(req: any, res: any) {
         let user = await prisma.user.findUnique({
           where: {
             walletAddress: fields.address
-          },
-          include: { accounts: true }
+          }
         });
         // Create new user if doesn't exist
         if (!user) {
-          const newUser = await prisma.user.create({
+          user = await prisma.user.create({
             data: {
               walletAddress: fields.address
             }
-          });
-          // create account
-          await prisma.account.create({
-            data: {
-              userId: newUser.id,
-              type: "credentials",
-              provider: "Ethereum",
-              providerAccountId: fields.address
-            }
-          });
-
-          user = await prisma.user.findUnique({
-            where: {
-              walletAddress: fields.address
-            },
-            include: { accounts: true }
           });
         }
 
@@ -182,22 +164,8 @@ export default async function auth(req: any, res: any) {
       },
     },
     from: process.env.EMAIL_FROM,
-    async sendVerificationRequest(params) {
-      const { identifier, url, provider, theme, token } = params;
-      const { host } = new URL(url);
-      const transport = createTransport(provider.server);
-      const result = await transport.sendMail({
-        to: identifier,
-        from: provider.from,
-        subject: `Sign in to ${host}`,
-        text: text({ url, host, token }),
-        html: html({ token }),
-      });
-      const failed = result.rejected.concat(result.pending).filter(Boolean);
-      if (failed.length) {
-        throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
-      }
-    },
+    generateVerificationToken,
+    sendVerificationRequest
   }),
   ];
 
@@ -218,8 +186,17 @@ export default async function auth(req: any, res: any) {
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
       async session({ session, token, user }) {
-        if (session.user) session.user.walletAddress = await linkWallet3Business(token.sub)
+        if (session.user) {
+          if (token.walletAddress) session.user.walletAddress = token.walletAddress as string
+          else session.user.walletAddress = await linkWallet3Business(token.sub!)
+        }
         return session;
+      },
+      async jwt({ token, user }) {
+        if (user && user.walletAddress) {
+          token.walletAddress = user.walletAddress
+        }
+        return token
       },
     },
   });

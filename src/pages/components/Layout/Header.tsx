@@ -13,6 +13,7 @@ interface IHeader {
 export const Header: NextPage<IHeader> = ({ loginCallback }) => {
   const [isLogin, setIsLogin] = useState(false);
   const { data: session } = useSession();
+  console.log("🚀 ~ file: Header.tsx:16 ~ session:", session);
   const [activeLink, setActiveLink] = useState("");
   const [scrollActive, setScrollActive] = useState(false);
   const { isAutoLogin, loginByWallet3, authSign } = useLoginMethod();

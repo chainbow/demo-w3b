@@ -1,5 +1,6 @@
 import type { GetServerSidePropsContext } from "next";
-import { DefaultSession, getServerSession } from "next-auth";
+import type { DefaultSession, DefaultUser } from "next-auth";
+import { getServerSession } from "next-auth";
 import auth from "../pages/api/auth/[...nextauth]";
 
 
@@ -16,6 +17,10 @@ declare module "next-auth" {
       id: string;
       walletAddress: string;
     } & DefaultSession["user"];
+  }
+
+  interface User extends DefaultUser {
+    walletAddress?: string | null;
   }
 }
 

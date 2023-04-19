@@ -1,41 +1,48 @@
 import { getCsrfToken, signIn } from "next-auth/react";
 import { SiweMessage } from "siwe";
-import { useAccount, useConnect, useDisconnect, useNetwork, useSignMessage } from "wagmi";
+import {
+  useAccount,
+  useConnect,
+  useDisconnect,
+  useNetwork,
+  useSignMessage,
+} from "wagmi";
 import { injectedConnector, walletConnector } from "../../pages/_app";
 
 const useLoginMethod = () => {
-  const {signMessageAsync} = useSignMessage();
-  const {chain} = useNetwork();
-  const {address, isConnected} = useAccount();
-  const {connect} = useConnect();
-  const {disconnect} = useDisconnect();
-
+  const { signMessageAsync } = useSignMessage();
+  const { chain } = useNetwork();
+  const { address, isConnected } = useAccount();
+  const { connect } = useConnect();
+  const { disconnect } = useDisconnect();
 
   const isAutoLogin = () => {
     return window.navigator?.userAgent?.indexOf("Wallet3") !== -1;
   };
 
-
   const loginByWallet3 = async () => {
     if (isAutoLogin()) {
       await loginByEthereum();
     } else {
-      window.open(`https://wallet3.io/wc/?uri=wallet3://open?url=https://dagen.life`);
+      window.open(
+        `https://wallet3.io/wc/?uri=wallet3://open?url=https://dagen.life`
+      );
     }
   };
 
-
   const loginByEthereum = async () => {
-    if (isConnected) await disconnect();
-    await connect({connector: injectedConnector});
+    if (isConnected) disconnect();
+    setTimeout(() => {
+      connect({ connector: injectedConnector });
+    }, 200);
   };
-
 
   const loginByWalletConnect = async () => {
-    if (isConnected) await disconnect();
-    await connect({connector: walletConnector});
+    if (isConnected) disconnect();
+    setTimeout(() => {
+      connect({ connector: walletConnector });
+    }, 200);
   };
-
 
   const loginByTwitter = async () => {
     await signIn("twitter");
@@ -46,7 +53,7 @@ const useLoginMethod = () => {
   };
 
   const loginByEmail = async (email: string) => {
-    await signIn("email", {redirect: false, email});
+    await signIn("email", { redirect: false, email });
   };
 
   const authSign = async () => {
@@ -61,7 +68,9 @@ const useLoginMethod = () => {
         chainId: chain?.id,
         nonce: await getCsrfToken(),
       });
-      const signature = await signMessageAsync({message: message.prepareMessage()});
+      const signature = await signMessageAsync({
+        message: message.prepareMessage(),
+      });
       await signIn("credentials", {
         message: JSON.stringify(message),
         redirect: false,
@@ -73,8 +82,16 @@ const useLoginMethod = () => {
     }
   };
 
-
-  return {isAutoLogin, loginByWallet3, loginByEthereum, loginByWalletConnect, loginByTwitter, loginByGoogle, loginByEmail, authSign};
+  return {
+    isAutoLogin,
+    loginByWallet3,
+    loginByEthereum,
+    loginByWalletConnect,
+    loginByTwitter,
+    loginByGoogle,
+    loginByEmail,
+    authSign,
+  };
 };
 
 export default useLoginMethod;
