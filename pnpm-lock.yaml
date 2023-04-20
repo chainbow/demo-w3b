@@ -52,6 +52,7 @@ specifiers:
   prettier: ^2.8.1
   prettier-plugin-tailwindcss: ^0.2.1
   prisma: ^4.9.0
+  qrcode.react: ^3.1.0
   react: 18.2.0
   react-dom: 18.2.0
   react-scroll: ^1.8.1
@@ -103,6 +104,7 @@ dependencies:
   nodemailer: 6.9.1
   postcss: 8.4.21
   postcss-import: 13.0.0_postcss@8.4.21
+  qrcode.react: 3.1.0_react@18.2.0
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-scroll: 1.8.9_biqbaboplfbrettd7655fr4n2y
@@ -8211,6 +8213,14 @@ packages:
     resolution: {integrity: sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==}
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     dev: true
+
+  /qrcode.react/3.1.0_react@18.2.0:
+    resolution: {integrity: sha512-oyF+Urr3oAMUG/OiOuONL3HXM+53wvuH3mtIWQrYmsXoAq0DkvZp2RYUWFSMFtbdOpuS++9v+WAkzNVkMlNW6Q==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /qrcode/1.4.4:
     resolution: {integrity: sha512-oLzEC5+NKFou9P0bMj5+v6Z40evexeE29Z9cummZXZ9QXyMr3lphkURzxjXgPJC5azpxcshoDWV1xE46z+/c3Q==}
